@@ -1,18 +1,76 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Bind resources to your worker in `wrangler.jsonc`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
+const BASE = 316781;
+
+/*
+	値を生成するヘルパー関数
+	引数で振る舞いを変えて、複数の機能から使い回す
+*/
+
+// 0 〜 max-1 の整数乱数
+const random = (max: number): number => Math.floor(Math.random() * max);
+
+// 指定タイムゾーンでの「今日の経過秒数」(0〜86399)
+const secondsOfDay = (timeZone: string): number => {
+	const parts = new Intl.DateTimeFormat("en-US", {
+		timeZone,
+		hour: "2-digit", minute: "2-digit", second: "2-digit",
+		hour12: false,
+	}).formatToParts(new Date());
+	const get = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0);
+	const h = get("hour") % 24; // hour12:false で 24 が出る環境対策
+	return h * 3600 + get("minute") * 60 + get("second");
+};
+
+/*
+	機能名 → 整数を返す関数の対応表。ここに足せば機能が増える
+	width / height で使う場合: 0 ≤ value ≤ 316780
+*/
+
+// 0 ≤ value ≤ 316781^2
+const sizeFeatures: Record<string, (req: Request) => number> = {
+	// 現在のUnix時刻(秒)
+	"unix-time": () => Math.floor(Date.now() / 1000),
+	// 0〜100350201960 の乱数
+	"random": () => random(BASE ** 2),
+};
+
+// 0 ≤ value ≤ 316780
+const features: Record<string, (req: Request) => number> = {
+	// アクセス元の現地タイムゾーンでの今日の経過秒数 (0〜86399)
+	"current-time": (req) => secondsOfDay((req.cf?.timezone as string) ?? "UTC"),
+	// 0〜316780 の乱数
+	"random": () => random(BASE),
+};
 
 export default {
-	async fetch(request, env, ctx): Promise<Response> {
-		return new Response("Hello World!");
+	async fetch(req): Promise<Response> {
+		const url = new URL(req.url);
+
+		let w: number, h: number;
+
+		const sizeName = url.searchParams.get("size");
+		if (sizeName) {
+			// size: 1つの大きい値を width/height に合成(基数 BASE)
+			const fn = sizeFeatures[sizeName];
+			const n = fn ? fn(req) : 0;
+			w = n % BASE;
+			h = Math.floor(n / BASE);
+		} else {
+			// width/height: 独立した2値
+			const pick = (axis: string): number => {
+				const name = url.searchParams.get(axis);
+				const fn = name ? features[name] : undefined;
+				return fn ? fn(req) : 0;
+			};
+			w = pick("width");
+			h = pick("height");
+		}
+
+		const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"></svg>`;
+		return new Response(svg, {
+			headers: {
+				"content-type": "image/svg+xml; charset=utf-8",
+				"cache-control": "no-store, no-cache, must-revalidate",
+			},
+		});
 	},
 } satisfies ExportedHandler<Env>;
