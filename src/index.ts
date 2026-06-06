@@ -21,7 +21,22 @@ const secondsOfDay = (timeZone: string): number => {
 };
 
 /*
-	機能名 → 整数を返す関数の対応表。ここに足せば機能が増える
+	機能の戻り値:
+	- number: 静的な寸法
+	- { init, anim }: 初期値 init と、<animate> 群を生成する関数(axis = "width" | "height")
+*/
+type Feature = number | { init: number; anim: (axis: string) => string };
+
+// 現在値 sec から毎秒+1、period 到達後は 0〜period の無限ループ(永久時計)
+const ticking = (sec: number, period: number): Feature => ({
+	init: sec,
+	anim: (axis) =>
+		`<animate id="t" attributeName="${axis}" from="${sec}" to="${period}" dur="${period - sec}s"/>` +
+		`<animate attributeName="${axis}" from="0" to="${period}" dur="${period}s" begin="t.end" repeatCount="indefinite"/>`,
+});
+
+/*
+	機能名 → 値を返す関数の対応表。ここに足せば機能が増える
 	width / height で使う場合: 0 ≤ value ≤ 316780
 */
 
@@ -34,9 +49,9 @@ const sizeFeatures: Record<string, (req: Request) => number> = {
 };
 
 // 0 ≤ value ≤ 316780
-const features: Record<string, (req: Request) => number> = {
-	// アクセス元の現地タイムゾーンでの今日の経過秒数 (0〜86399)
-	"current-time": (req) => secondsOfDay((req.cf?.timezone as string) ?? "UTC"),
+const features: Record<string, (req: Request) => Feature> = {
+	// アクセス元の現地タイムゾーンでの今日の経過秒数 (0〜86399) から毎秒+1、深夜を跨いで永久に周回
+	"current-time": (req) => ticking(secondsOfDay((req.cf?.timezone as string) ?? "UTC"), 86400),
 	// 0〜316780 の乱数
 	"random": () => random(BASE),
 };
@@ -45,7 +60,7 @@ export default {
 	async fetch(req): Promise<Response> {
 		const url = new URL(req.url);
 
-		let w: number, h: number;
+		let w: Feature, h: Feature;
 
 		const sizeName = url.searchParams.get("size");
 		if (sizeName) {
@@ -56,7 +71,7 @@ export default {
 			h = Math.floor(n / BASE);
 		} else {
 			// width/height: 独立した2値
-			const pick = (axis: string): number => {
+			const pick = (axis: string): Feature => {
 				const name = url.searchParams.get(axis);
 				const fn = name ? features[name] : undefined;
 				return fn ? fn(req) : 0;
@@ -65,7 +80,14 @@ export default {
 			h = pick("height");
 		}
 
-		const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"></svg>`;
+		// 値が静的なら属性のみ、アニメ仕様なら init を初期値に <animate> 群を生成
+		const dim = (axis: "width" | "height", v: Feature): [number, string] =>
+			typeof v === "number" ? [v, ""] : [v.init, v.anim(axis)];
+
+		const [wVal, wAnim] = dim("width", w);
+		const [hVal, hAnim] = dim("height", h);
+
+		const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${wVal}" height="${hVal}">${wAnim}${hAnim}</svg>`;
 		return new Response(svg, {
 			headers: {
 				"content-type": "image/svg+xml; charset=utf-8",
