@@ -12,8 +12,10 @@
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.12.4",
     "@types/node": "^25.9.1",
+    "prettier-plugin-embed": "^0.5.1",
+    "prettier-plugin-sql-cst": "^0.22.1",
     "typescript": "^5.5.2",
     "vitest": "~3.2.0",
-    "wrangler": "^4.95.0"
+    "wrangler": "^4.104.0"
   }
 }
