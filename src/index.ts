@@ -75,7 +75,7 @@ app.get('/heartbeat', async (c) => {
   c.header('content-type', 'image/svg+xml')
   c.header('cache-control', 'no-store')
   return c.body(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="30"><text x="0" y="20" font-size="18">Online: ${online}</text></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="24"><text x="0" y="20" font-size="18">Online: ${online}</text></svg>`,
   )
 })
 
