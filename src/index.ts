@@ -6,7 +6,7 @@ import { D1Dialect } from 'kysely-d1'
 import type { Context } from 'hono'
 
 const BASE = 316781
-const VALUE_MAX = 351 * BASE - 1
+const VALUE_MAX = 1000000
 
 const MINUTE = 60
 const HOUR = 60 * MINUTE
