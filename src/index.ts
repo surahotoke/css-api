@@ -1,98 +1,163 @@
-const BASE = 316781;
+import { Hono } from 'hono'
+import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
+import { DurableObject, waitUntil } from 'cloudflare:workers'
+import { Kysely, sql } from 'kysely'
+import { D1Dialect } from 'kysely-d1'
+import type { Context } from 'hono'
 
-/*
-	値を生成するヘルパー関数
-	引数で振る舞いを変えて、複数の機能から使い回す
-*/
+const BASE = 316781
+const VALUE_MAX = 351 * BASE - 1
 
-// 0 〜 max-1 の整数乱数
-const random = (max: number): number => Math.floor(Math.random() * max);
+const MINUTE = 60
+const HOUR = 60 * MINUTE
+const DAY = 24 * HOUR
+const WEEK = 7 * DAY
 
-// 指定タイムゾーンでの「今日の経過秒数」(0〜86399)
-const secondsOfDay = (timeZone: string): number => {
-	const parts = new Intl.DateTimeFormat("en-US", {
-		timeZone,
-		hour: "2-digit", minute: "2-digit", second: "2-digit",
-		hour12: false,
-	}).formatToParts(new Date());
-	const get = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0);
-	const h = get("hour") % 24; // hour12:false で 24 が出る環境対策
-	return h * 3600 + get("minute") * 60 + get("second");
-};
+const SECOND_MS = 1000
+const MINUTE_MS = MINUTE * SECOND_MS
+const HOUR_MS = HOUR * SECOND_MS
+const DAY_MS = DAY * SECOND_MS
+const WEEK_MS = WEEK * SECOND_MS
 
-/*
-	機能の戻り値:
-	- number: 静的な寸法
-	- { init, anim }: 初期値 init と、<animate> 群を生成する関数(axis = "width" | "height")
-*/
-type Feature = number | { init: number; anim: (axis: string) => string };
+const app = new Hono<{ Bindings: Env }>()
+const cookie = new Hono<{ Bindings: Env }>()
+const info = new Hono<{ Bindings: Env }>()
+const time = new Hono<{ Bindings: Env }>()
 
-// 現在値 sec から毎秒+1、period 到達後は 0〜period の無限ループ(永久時計)
-const ticking = (sec: number, period: number): Feature => ({
-	init: sec,
-	anim: (axis) =>
-		`<animate id="t" attributeName="${axis}" from="${sec}" to="${period}" dur="${period - sec}s"/>` +
-		`<animate attributeName="${axis}" from="0" to="${period}" dur="${period}s" begin="t.end" repeatCount="indefinite"/>`,
-});
+const COOKIE_OPT = { sameSite: 'None', secure: true, maxAge: 34560000, path: '/' } as const
 
-/*
-	機能名 → 値を返す関数の対応表。ここに足せば機能が増える
-	width / height で使う場合: 0 ≤ value ≤ 316780
-*/
+app.get('/', async (c) => {
+  c.header('content-type', 'image/svg+xml')
+  c.header('cache-control', 'no-store')
+  return c.body('<svg xmlns="http://www.w3.org/2000/svg" width="123" height="456"></svg>')
+})
 
-// 0 ≤ value ≤ 316781^2
-const sizeFeatures: Record<string, (req: Request) => number> = {
-	// 現在のUnix時刻(秒)
-	"unix-time": () => Math.floor(Date.now() / 1000),
-	// 0〜100350201960 の乱数
-	"random": () => random(BASE ** 2),
-};
+cookie.get('/get/:name', (c) => {
+  const name = c.req.param('name')
+  const raw = getCookie(c, name)
+  let value = 0
+  let status: number
+  if (raw === undefined) {
+    status = 404
+  } else {
+    const n = Math.round(Number(raw))
+    if (Number.isNaN(n) || n < 0 || n > VALUE_MAX) {
+      status = 404
+    } else {
+      value = n
+      status = 200
+    }
+  }
+  return infoResponse(c, value, status)
+})
 
-// 0 ≤ value ≤ 316780
-const features: Record<string, (req: Request) => Feature> = {
-	// アクセス元の現地タイムゾーンでの今日の経過秒数 (0〜86399) から毎秒+1、深夜を跨いで永久に周回
-	"current-time": (req) => ticking(secondsOfDay((req.cf?.timezone as string) ?? "UTC"), 86400),
-	// 0〜316780 の乱数
-	"random": () => random(BASE),
-};
+cookie.get('/set/:name', (c) => {
+  const name = c.req.param('name')
+  setCookie(c, name, c.req.query('value') ?? '', COOKIE_OPT)
+  return infoResponse(c, 0, 200)
+})
 
-export default {
-	async fetch(req): Promise<Response> {
-		const url = new URL(req.url);
+cookie.get('/delete/:name', (c) => {
+  const name = c.req.param('name')
+  deleteCookie(c, name, COOKIE_OPT)
+  return infoResponse(c, 0, 200)
+})
 
-		let w: Feature, h: Feature;
+app.route('/cookie', cookie)
 
-		const sizeName = url.searchParams.get("size");
-		if (sizeName) {
-			// size: 1つの大きい値を width/height に合成(基数 BASE)
-			const fn = sizeFeatures[sizeName];
-			const n = fn ? fn(req) : 0;
-			w = n % BASE;
-			h = Math.floor(n / BASE);
-		} else {
-			// width/height: 独立した2値
-			const pick = (axis: string): Feature => {
-				const name = url.searchParams.get(axis);
-				const fn = name ? features[name] : undefined;
-				return fn ? fn(req) : 0;
-			};
-			w = pick("width");
-			h = pick("height");
-		}
+app.get('/heartbeat', async (c) => {
+  let uuid = getCookie(c, 'uuid')
+  if (!uuid) {
+    uuid = crypto.randomUUID()
+    setCookie(c, 'uuid', uuid, COOKIE_OPT)
+  }
+  const online = await c.env.PRESENCE.getByName('global').heartbeat(uuid, Date.now())
+  c.header('content-type', 'image/svg+xml')
+  c.header('cache-control', 'no-store')
+  return c.body(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="30"><text x="0" y="20" font-size="18">Online: ${online}</text></svg>`,
+  )
+})
 
-		// 値が静的なら属性のみ、アニメ仕様なら init を初期値に <animate> 群を生成
-		const dim = (axis: "width" | "height", v: Feature): [number, string] =>
-			typeof v === "number" ? [v, ""] : [v.init, v.anim(axis)];
+time.get('/current', (c) => {
+  const timeZone = (c.req.raw.cf?.timezone as string) ?? 'Asia/Tokyo'
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(new Date())
+  const part = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0)
+  return currentTimeResponse(c, part('hour'), part('minute'), part('second'), 200)
+})
 
-		const [wVal, wAnim] = dim("width", w);
-		const [hVal, hAnim] = dim("height", h);
+info.route('/time', time)
 
-		const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${wVal}" height="${hVal}">${wAnim}${hAnim}</svg>`;
-		return new Response(svg, {
-			headers: {
-				"content-type": "image/svg+xml; charset=utf-8",
-				"cache-control": "no-store, no-cache, must-revalidate",
-			},
-		});
-	},
-} satisfies ExportedHandler<Env>;
+info.get('/online-count', async (c) => {
+  const online = await c.env.PRESENCE.getByName('global').peek(Date.now())
+  return infoResponse(c, online, 200)
+})
+
+app.route('/info', info)
+
+function dataToSvgSize(value: number, status: number): { width: number; height: number } {
+  return {
+    width: value % BASE,
+    height: 900 * Math.floor(value / BASE) + status - 100,
+  }
+}
+
+function infoResponse(c: Context<{ Bindings: Env }>, value: number, status: number, cacheControl = 'no-store'): Response {
+  const { width, height } = dataToSvgSize(value, status)
+  c.header('content-type', 'image/svg+xml')
+  c.header('cache-control', cacheControl)
+  return c.body(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"></svg>`)
+}
+
+function currentTimeResponse(c: Context<{ Bindings: Env }>, hour: number, minute: number, second: number, status: number): Response {
+  const minuteSecond = minute * MINUTE + second
+  const width = minuteSecond
+  const height = hour * 900 + (status - 100)
+  const widthAnim =
+    `<animate id="t" attributeName="width" from="${minuteSecond}" to="${HOUR}" dur="${HOUR - minuteSecond}s"/>` +
+    `<animate attributeName="width" from="0" to="${HOUR}" dur="${HOUR}s" begin="t.end" repeatCount="indefinite"/>`
+  const values: number[] = []
+  const keyTimes: number[] = []
+  for (let i = 0; i < 25; i++) {
+    const h = (hour + i) % 24
+    values.push(h * 900 + (status - 100))
+    const boundary = i === 0 ? 0 : (HOUR - minuteSecond + (i - 1) * HOUR) / DAY
+    keyTimes.push(boundary)
+  }
+  const heightAnim =
+    `<animate attributeName="height" calcMode="discrete" ` +
+    `values="${values.join(';')}" keyTimes="${keyTimes.join(';')}" ` +
+    `dur="${DAY}s" repeatCount="indefinite"/>`
+  c.header('content-type', 'image/svg+xml')
+  c.header('cache-control', 'no-store')
+  return c.body(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">${widthAnim}${heightAnim}</svg>`)
+}
+
+export class Presence extends DurableObject {
+  lastHeartbeat = new Map<string, number>()
+
+  heartbeat(uuid: string, now: number): number {
+    this.lastHeartbeat.set(uuid, now)
+    return this.countAlive(now)
+  }
+
+  peek(now: number): number {
+    return this.countAlive(now)
+  }
+
+  private countAlive(now: number): number {
+    let alive = 0
+    for (const [id, t] of this.lastHeartbeat) {
+      if (t >= now - 10 * SECOND_MS) alive++
+      else this.lastHeartbeat.delete(id)
+    }
+    return alive
+  }
+}
+
+export default app
