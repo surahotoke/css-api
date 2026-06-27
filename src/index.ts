@@ -5,6 +5,8 @@ import { Kysely, sql } from 'kysely'
 import { D1Dialect } from 'kysely-d1'
 import type { Context } from 'hono'
 
+const DEFAULT_TIMEZONE = 'Asia/Tokyo'
+
 const BASE = 316781
 const VALUE_MAX = 999999
 
@@ -22,7 +24,7 @@ const WEEK_MS = WEEK * SECOND_MS
 const app = new Hono<{ Bindings: Env }>()
 const cookie = new Hono<{ Bindings: Env }>()
 const info = new Hono<{ Bindings: Env }>()
-const time = new Hono<{ Bindings: Env }>()
+const datetime = new Hono<{ Bindings: Env }>()
 
 const COOKIE_OPT = { sameSite: 'None', secure: true, maxAge: 34560000, path: '/' } as const
 
@@ -79,23 +81,49 @@ app.get('/heartbeat', async (c) => {
   )
 })
 
-time.get('/current', (c) => {
-  const timeZone = (c.req.raw.cf?.timezone as string) ?? 'Asia/Tokyo'
-  const parts = new Intl.DateTimeFormat('sv-SE', {
-    timeZone,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).formatToParts(new Date())
-  const part = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0)
-  return currentTimeResponse(c, part('hour'), part('minute'), part('second'), 200)
+datetime.get('/clock', (c) => {
+  const now = new Date()
+  const nowParts = getNowParts(now, getTimezone(c))
+  return clockResponse(c, nowParts.hour, nowParts.minute, nowParts.second, 200)
 })
 
-info.route('/time', time)
+datetime.get('/current-time', (c) => {
+  const now = new Date()
+  const nowParts = getNowParts(now, getTimezone(c))
+  const value = nowParts.hour * HOUR + nowParts.minute * MINUTE + nowParts.second
+  return infoResponse(c, value, 200)
+})
+
+datetime.get('/current-date', (c) => {
+  const now = new Date()
+  const nowParts = getNowParts(now, getTimezone(c))
+  const value = nowParts.year * 372 + (nowParts.month - 1) * 31 + (nowParts.date - 1)
+  return infoResponse(c, value, 200)
+})
+
+datetime.get('/current-day', (c) => {
+  const now = new Date()
+  const nowParts = getNowParts(now, getTimezone(c))
+  return infoResponse(c, nowParts.day, 200)
+})
+
+info.route('/datetime', datetime)
 
 info.get('/online-count', async (c) => {
   const online = await c.env.PRESENCE.getByName('global').peek(Date.now())
   return infoResponse(c, online, 200)
+})
+
+info.get('/random', (c) => {
+  const fromRaw = c.req.query('from')
+  const toRaw = c.req.query('to')
+  const from = fromRaw === undefined ? 0 : Math.round(Number(fromRaw))
+  const to = toRaw === undefined ? VALUE_MAX : Math.round(Number(toRaw))
+  if (Number.isNaN(from) || Number.isNaN(to) || from > to || from < 0 || to > VALUE_MAX) {
+    return infoResponse(c, 0, 400)
+  }
+  const value = Math.floor(Math.random() * (to - from + 1)) + from
+  return infoResponse(c, value, 200)
 })
 
 app.route('/info', info)
@@ -114,7 +142,34 @@ function infoResponse(c: Context<{ Bindings: Env }>, value: number, status: numb
   return c.body(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"></svg>`)
 }
 
-function currentTimeResponse(c: Context<{ Bindings: Env }>, hour: number, minute: number, second: number, status: number): Response {
+function getTimezone(c: Context<{ Bindings: Env }>): string {
+  return (c.req.raw.cf?.timezone as string) ?? DEFAULT_TIMEZONE
+}
+
+function getNowParts(date: Date, timezone: string = DEFAULT_TIMEZONE) {
+  const today = new Intl.DateTimeFormat('sv-SE', { timeZone: timezone }).format(date)
+  const parts = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(date)
+  const part = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0)
+  return {
+    year: part('year'),
+    month: part('month'),
+    date: part('day'),
+    day: (new Date(today).getUTCDay() + 6) % 7,
+    hour: part('hour'),
+    minute: part('minute'),
+    second: part('second'),
+  }
+}
+
+function clockResponse(c: Context<{ Bindings: Env }>, hour: number, minute: number, second: number, status: number): Response {
   const minuteSecond = minute * MINUTE + second
   const width = minuteSecond
   const height = hour * 900 + (status - 100)
