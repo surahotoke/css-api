@@ -128,20 +128,6 @@ info.get('/random', (c) => {
 
 app.route('/info', info)
 
-function dataToSvgSize(value: number, status: number): { width: number; height: number } {
-  return {
-    width: value % BASE,
-    height: 900 * Math.floor(value / BASE) + status - 100,
-  }
-}
-
-function infoResponse(c: Context<{ Bindings: Env }>, value: number, status: number, cacheControl = 'no-store'): Response {
-  const { width, height } = dataToSvgSize(value, status)
-  c.header('content-type', 'image/svg+xml')
-  c.header('cache-control', cacheControl)
-  return c.body(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"></svg>`)
-}
-
 function getTimezone(c: Context<{ Bindings: Env }>): string {
   return (c.req.raw.cf?.timezone as string) ?? DEFAULT_TIMEZONE
 }
@@ -167,6 +153,20 @@ function getNowParts(date: Date, timezone: string = DEFAULT_TIMEZONE) {
     minute: part('minute'),
     second: part('second'),
   }
+}
+
+function dataToSvgSize(value: number, status: number): { width: number; height: number } {
+  return {
+    width: value % BASE,
+    height: 900 * Math.floor(value / BASE) + status - 100,
+  }
+}
+
+function infoResponse(c: Context<{ Bindings: Env }>, value: number, status: number, cacheControl = 'no-store'): Response {
+  const { width, height } = dataToSvgSize(value, status)
+  c.header('content-type', 'image/svg+xml')
+  c.header('cache-control', cacheControl)
+  return c.body(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"></svg>`)
 }
 
 function clockResponse(c: Context<{ Bindings: Env }>, hour: number, minute: number, second: number, status: number): Response {
