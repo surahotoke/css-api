@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>css-api</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: system-ui, sans-serif;
+      line-height: 1.7;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 4px; }
+    .lead { color: gray; margin-top: 0; }
+    h2 {
+      margin-top: 40px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid gray;
+    }
+    section {
+      margin-top: 16px;
+      padding: 8px 18px 16px;
+      border: 1px solid color-mix(in srgb, gray 40%, transparent);
+      border-radius: 10px;
+    }
+    h3 { margin-bottom: 4px; font-size: 1.05rem; }
+    h3 code { font-size: 1rem; }
+    p { margin: 4px 0; }
+    code {
+      font-family: ui-monospace, monospace;
+      background: color-mix(in srgb, gray 18%, transparent);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    dl { margin: 6px 0; }
+    dt {
+      font-family: ui-monospace, monospace;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+    dd { margin: 0 0 0 1.5em; color: gray; }
+    .eg-label { font-weight: bold; margin-bottom: 0; }
+    .eg { font-size: .9rem; margin-top: 0; }
+    footer { margin-top: 56px; }
+    footer p { font-size: .95rem; }
+  </style>
+</head>
+<body>
+
+  <h1>css-api</h1>
+  <p class="lead">CSS から読み取るためのデータを SVG として返す API。値は SVG の寸法に、表示用テキストは画像として返す。</p>
+
+  <h2>cookie</h2>
+
+  <section>
+    <h3><code>/cookie/get/:name</code></h3>
+    <p>cookie の値を読んで返す。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/get/score</code> → score という cookie を読む</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/set/:name</code></h3>
+    <p>cookie に値を書き込む。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>書き込む値</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/set/score?value=100</code> → score に 100 を書き込む</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/delete/:name</code></h3>
+    <p>cookie を削除する。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/delete/score</code> → score を削除する</p>
+  </section>
+
+  <h2>heartbeat</h2>
+
+  <section>
+    <h3><code>/heartbeat</code></h3>
+    <p>アクセスを打刻し、現在の同時接続数をテキスト画像で返す。</p>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/heartbeat</code> → 同時接続数を表示する</p>
+  </section>
+
+  <h2>info</h2>
+
+  <section>
+    <h3><code>/info/datetime/clock</code></h3>
+    <p>現在時刻。SVG 内で animate し、時計のように進む。</p>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/datetime/clock</code> → 進み続ける時計</p>
+  </section>
+
+  <section>
+    <h3><code>/info/datetime/current-time</code></h3>
+    <p>現在の時分秒（静的）。</p>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/datetime/current-time</code> → 現在の時分秒</p>
+  </section>
+
+  <section>
+    <h3><code>/info/datetime/current-date</code></h3>
+    <p>現在の年月日（静的）。</p>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/datetime/current-date</code> → 現在の年月日</p>
+  </section>
+
+  <section>
+    <h3><code>/info/datetime/current-day</code></h3>
+    <p>現在の曜日。月曜を 0 とした 0〜6。</p>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/datetime/current-day</code> → 現在の曜日</p>
+  </section>
+
+  <section>
+    <h3><code>/info/online-count</code></h3>
+    <p>現在の同時接続数。打刻はせず数だけ返す。</p>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/online-count</code> → 現在の同時接続数</p>
+  </section>
+
+  <section>
+    <h3><code>/info/random</code></h3>
+    <p>指定範囲の整数乱数（両端を含む）。</p>
+    <dl>
+      <dt>from</dt><dd>下限（省略時 0）</dd>
+      <dt>to</dt><dd>上限（省略時 999999）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/random?from=1&amp;to=6</code> → 1 から 6 までの乱数を返す</p>
+  </section>
+
+  <h2>view</h2>
+
+  <section>
+    <h3><code>/view/datetime/now</code></h3>
+    <p>現在日時を、人が読めるテキスト画像で返す。基準は常に現在時刻で、パラメータでずらして表示できる。</p>
+    <dl>
+      <dt>year / month / week / date / day / hour / minute / second</dt>
+      <dd>その単位を絶対値でセット。day は曜日（Mon〜Sun）。優先度は date &gt; week &gt; day。</dd>
+      <dt>addyear / addmonth / addweek / adddate / addhour / addminute / addsecond</dt>
+      <dd>その単位を相対的に加減算（負も可）。</dd>
+      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（year,month,date,day,hour,minute,second）。省略時は年月日時分。</dd>
+      <dt>fmt</dt><dd>書式ロケール（例 ja-JP, en-US, sv-SE）。省略時はブラウザの言語。</dd>
+      <dt>pad</dt><dd>付けると月日時分秒をゼロ埋め（2桁）にする。</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/view/datetime/now?addhour=3&amp;show=hour,minute&amp;pad</code> → 3 時間後の時分をゼロ埋めで表示</p>
+  </section>
+
+  <footer>
+    <h2>ソースコード</h2>
+    <p><a href="https://github.com/surahotoke/css-api">css-api</a> — この API 本体</p>
+    <p><a href="https://github.com/surahotoke/ultra-css-template">ultra-css-template</a> — この API を使う CSS 側のテンプレート</p>
+  </footer>
+
+</body>
+</html>
