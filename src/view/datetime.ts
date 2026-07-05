@@ -37,7 +37,9 @@ datetime.get('/now', (c) => {
   const showRaw = c.req.query('show')
   const show = showRaw === undefined ? ['year', 'month', 'date', 'hour', 'minute'] : showRaw.split(',').map((s) => s.trim())
   const VALID_FIELDS = ['year', 'month', 'date', 'day', 'hour', 'minute', 'second']
-  if (show.some((f) => !VALID_FIELDS.includes(f))) return errorResponse(c, ERROR_CODE.BAD_REQUEST)
+
+  if (show.includes('all')) show.splice(0, show.length, ...VALID_FIELDS)
+  else if (show.some((f) => !VALID_FIELDS.includes(f))) return errorResponse(c, ERROR_CODE.BAD_REQUEST)
 
   const digit = c.req.query('pad') !== undefined ? '2-digit' : 'numeric'
   const options = buildDateOptions(show, digit)

@@ -23,9 +23,8 @@ weather.get('/now', async (c) => {
     'wind-speed',
     'pressure',
   ]
-  if (show.some((f) => !VALID_FIELDS.includes(f))) {
-    return errorResponse(c, ERROR_CODE.BAD_REQUEST)
-  }
+  if (show.includes('all')) show.splice(0, show.length, ...VALID_FIELDS)
+  else if (show.some((f) => !VALID_FIELDS.includes(f))) return errorResponse(c, ERROR_CODE.BAD_REQUEST)
 
   return viewTextResponse(c, buildWeatherText(show, data))
 })
@@ -41,10 +40,10 @@ function buildWeatherText(fields: string[], data: any): string {
         parts.push(weatherCodeToText(data.current.weather_code))
         break
       case 'temperature':
-        parts.push(`${Math.round(data.current.temperature_2m)}℃`)
+        parts.push(`${data.current.temperature_2m}℃`)
         break
       case 'apparent-temperature':
-        parts.push(`体感${Math.round(data.current.apparent_temperature)}℃`)
+        parts.push(`体感${data.current.apparent_temperature}℃`)
         break
       case 'humidity':
         parts.push(`湿度${data.current.relative_humidity_2m}%`)
@@ -56,10 +55,10 @@ function buildWeatherText(fields: string[], data: any): string {
         parts.push(`降水確率${data.current.precipitation_probability}%`)
         break
       case 'wind-speed':
-        parts.push(`風速${Math.round(data.current.wind_speed_10m)}km/h`)
+        parts.push(`風速${data.current.wind_speed_10m}km/h`)
         break
       case 'pressure':
-        parts.push(`気圧${Math.round(data.current.surface_pressure)}hPa`)
+        parts.push(`気圧${data.current.surface_pressure}hPa`)
         break
     }
   }

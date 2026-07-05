@@ -8,13 +8,9 @@ export const cookie = new Hono<{ Bindings: Env }>()
 cookie.get('/get/:name', (c) => {
   const name = c.req.param('name')
   const raw = getCookie(c, name)
-  if (raw === undefined) {
-    return errorResponse(c, ERROR_CODE.NOT_FOUND)
-  }
+  if (raw === undefined) return errorResponse(c, ERROR_CODE.NOT_FOUND)
   const value = Math.round(Number(raw))
-  if (Number.isNaN(value) || value < 0 || value > VALUE_MAX) {
-    return errorResponse(c, ERROR_CODE.NOT_FOUND)
-  }
+  if (Number.isNaN(value) || value < 0 || value > VALUE_MAX) return errorResponse(c, ERROR_CODE.NOT_FOUND)
   return infoResponse(c, value)
 })
 
