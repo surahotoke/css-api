@@ -242,6 +242,17 @@
     <p class="eg"><code>/view/datetime/now?addhour=3&amp;show=hour,minute&amp;pad</code> → 3 時間後の時分をゼロ埋めで表示</p>
   </section>
 
+  <section>
+    <h3><code>/view/weather/now</code></h3>
+    <p>現在の天気を、人が読めるテキスト画像で返す。show で表示要素を選べる。</p>
+    <dl>
+      <dt>lat / lon</dt><dd>緯度・経度（省略時はアクセス元の現在地）</dd>
+      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（weather-code, weather, temperature, apparent-temperature, humidity, precipitation, probability, wind-speed, pressure）。省略時は weather, temperature, humidity。</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/view/weather/now?show=weather,temperature,humidity</code> → 快晴 23℃ 湿度81%</p>
+  </section>
+
   <footer>
     <h2>ソースコード</h2>
     <p><a href="https://github.com/surahotoke/css-api">css-api</a> — この API 本体</p>

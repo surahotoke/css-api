@@ -1,10 +1,7 @@
 import { Hono } from 'hono'
-import type { Context } from 'hono'
-import { waitUntil } from 'cloudflare:workers'
-import { CACHE_MEDIUM, ERROR_CODE } from '../constants'
+import { ERROR_CODE } from '../constants'
+import { fetchWeather } from '../weather'
 import { infoResponse, errorResponse } from './response'
-
-const cache = caches.default
 
 export const weather = new Hono<{ Bindings: Env }>()
 
@@ -57,30 +54,3 @@ weather.get('/pressure', async (c) => {
   if (!data) return errorResponse(c, ERROR_CODE.BAD_GATEWAY)
   return infoResponse(c, Math.round(data.current.surface_pressure))
 })
-
-async function fetchWeather(c: Context<{ Bindings: Env }>): Promise<any | null> {
-  const cf = c.req.raw.cf
-  const lat = c.req.query('lat') ?? cf?.latitude ?? '35.6895'
-  const lon = c.req.query('lon') ?? cf?.longitude ?? '139.6917'
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,precipitation_probability,apparent_temperature,wind_speed_10m,weather_code,surface_pressure`
-  const cacheKey = new Request(url)
-  const cached = await cache.match(cacheKey)
-  if (cached) {
-    return await cached.json()
-  }
-  try {
-    const res = await fetch(url)
-    if (!res.ok) return null
-    const data = await res.json()
-    const cachedRes = new Response(JSON.stringify(data), {
-      headers: {
-        'content-type': 'application/json',
-        'cache-control': `max-age=${CACHE_MEDIUM}`,
-      },
-    })
-    waitUntil(cache.put(cacheKey, cachedRes))
-    return data
-  } catch {
-    return null
-  }
-}
