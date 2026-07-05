@@ -19,6 +19,9 @@
       "fallthrough": true,
     },
   ],
+  "triggers": {
+    "crons": ["10 0 * * *"],
+  },
   "durable_objects": {
     "bindings": [
       {
@@ -31,6 +34,19 @@
     {
       "tag": "v1",
       "new_sqlite_classes": ["Presence"],
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "4143266c443c4d4695a2457cbf87a00d",
+    },
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "DB",
+      "database_id": "5a84f50b-22d4-4af5-9204-fa187a7430d6",
     },
   ],
   /**
