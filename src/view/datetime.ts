@@ -1,12 +1,11 @@
 import { Hono } from 'hono'
-import { WEEKDAYS } from './constants'
-import { getTimezone, getFmtLocale, getNowParts, shiftDate, buildDateOptions } from './datetime'
+import { WEEKDAYS } from '../constants'
+import { getTimezone, getFmtLocale, getNowParts, shiftDate, buildDateOptions } from '../datetime'
 import { viewTextResponse, errorResponse } from './response'
 
-export const view = new Hono<{ Bindings: Env }>()
-const viewDatetime = new Hono<{ Bindings: Env }>()
+export const datetime = new Hono<{ Bindings: Env }>()
 
-viewDatetime.get('/now', (c) => {
+datetime.get('/now', (c) => {
   const now = new Date()
   const nowParts = getNowParts(now, getTimezone(c))
 
@@ -47,5 +46,3 @@ viewDatetime.get('/now', (c) => {
   const text = new Intl.DateTimeFormat(getFmtLocale(c), options).format(fmtDate)
   return viewTextResponse(c, text)
 })
-
-view.route('/datetime', viewDatetime)
