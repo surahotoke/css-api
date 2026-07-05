@@ -126,6 +126,87 @@
   </section>
 
   <section>
+    <h3><code>/info/weather/temperature</code></h3>
+    <p>現在の気温。絶対温度の10倍。</p>
+    <dl>
+      <dt>lat</dt><dd>緯度（省略時 35.6895＝東京）</dd>
+      <dt>lon</dt><dd>経度（省略時 139.6917＝東京）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/weather/temperature?lat=35.6895&lon=139.6917</code> → 2967（296.7K）</p>
+  </section>
+
+  <section>
+    <h3><code>/info/weather/apparent-temperature</code></h3>
+    <p>現在の体感温度。絶対温度の10倍。</p>
+    <dl>
+      <dt>lat / lon</dt><dd>緯度・経度（省略時は東京）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/weather/apparent-temperature</code> → 3025（302.5K）</p>
+  </section>
+
+  <section>
+    <h3><code>/info/weather/humidity</code></h3>
+    <p>現在の相対湿度（%）。</p>
+    <dl>
+      <dt>lat / lon</dt><dd>緯度・経度（省略時は東京）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/weather/humidity</code> → 81</p>
+  </section>
+
+  <section>
+    <h3><code>/info/weather/precipitation</code></h3>
+    <p>現在の降水量（mm）。</p>
+    <dl>
+      <dt>lat / lon</dt><dd>緯度・経度（省略時は東京）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/weather/precipitation</code> → 0</p>
+  </section>
+
+  <section>
+    <h3><code>/info/weather/probability</code></h3>
+    <p>現在の降水確率（%）。</p>
+    <dl>
+      <dt>lat / lon</dt><dd>緯度・経度（省略時は東京）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/weather/probability</code> → 59</p>
+  </section>
+
+  <section>
+    <h3><code>/info/weather/wind-speed</code></h3>
+    <p>現在の風速（km/h、四捨五入）。</p>
+    <dl>
+      <dt>lat / lon</dt><dd>緯度・経度（省略時は東京）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/weather/wind-speed</code> → 12</p>
+  </section>
+
+  <section>
+    <h3><code>/info/weather/weather-code</code></h3>
+    <p>現在の天気コード（WMO code）。0=晴れ、45=霧、51-67=雨、71-77=雪、95-99=雷雨など。</p>
+    <dl>
+      <dt>lat / lon</dt><dd>緯度・経度（省略時は東京）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/weather/weather-code</code> → 3（曇り）</p>
+  </section>
+
+  <section>
+    <h3><code>/info/weather/pressure</code></h3>
+    <p>現在の気圧（hPa、四捨五入）。</p>
+    <dl>
+      <dt>lat / lon</dt><dd>緯度・経度（省略時は東京）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/weather/pressure</code> → 1013</p>
+  </section>
+
+  <section>
     <h3><code>/info/online-count</code></h3>
     <p>現在の同時接続数。打刻はせず数だけ返す。</p>
     <p class="eg-label">使用例:</p>

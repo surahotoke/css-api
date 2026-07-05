@@ -17,6 +17,15 @@ export const HOUR_MS = HOUR * SECOND_MS
 export const DAY_MS = DAY * SECOND_MS
 export const WEEK_MS = WEEK * SECOND_MS
 
+/** リアルタイム性が重要なデータ（在庫、為替など） */
+export const CACHE_SHORT = MINUTE
+
+/** 通常のデータ（天気、ニュースなど） */
+export const CACHE_MEDIUM = 10 * MINUTE
+
+/** 更新頻度が低いデータ（株価の終値、過去ログなど） */
+export const CACHE_LONG = HOUR
+
 export const COOKIE_OPT = { sameSite: 'None', secure: true, maxAge: 34560000, path: '/' } as const
 
 export const STATUS_TEXT: Record<number, string> = {
