@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { WEEKDAYS } from '../constants'
+import { WEEKDAYS, ERROR_CODE } from '../constants'
 import { getTimezone, getFmtLocale, getNowParts, shiftDate, buildDateOptions } from '../datetime'
 import { viewTextResponse, errorResponse } from './response'
 
@@ -28,16 +28,16 @@ datetime.get('/now', (c) => {
   ]
   for (const name of NUM_PARAMS) {
     const raw = c.req.query(name)
-    if (raw !== undefined && Number.isNaN(Number(raw))) return errorResponse(c, 400)
+    if (raw !== undefined && Number.isNaN(Number(raw))) return errorResponse(c, ERROR_CODE.BAD_REQUEST)
   }
 
   const dayRaw = c.req.query('day')
-  if (dayRaw !== undefined && !WEEKDAYS.includes(dayRaw)) return errorResponse(c, 400)
+  if (dayRaw !== undefined && !WEEKDAYS.includes(dayRaw)) return errorResponse(c, ERROR_CODE.BAD_REQUEST)
 
   const showRaw = c.req.query('show')
   const show = showRaw === undefined ? ['year', 'month', 'date', 'hour', 'minute'] : showRaw.split(',').map((s) => s.trim())
   const VALID_FIELDS = ['year', 'month', 'date', 'day', 'hour', 'minute', 'second']
-  if (show.some((f) => !VALID_FIELDS.includes(f))) return errorResponse(c, 400)
+  if (show.some((f) => !VALID_FIELDS.includes(f))) return errorResponse(c, ERROR_CODE.BAD_REQUEST)
 
   const digit = c.req.query('pad') !== undefined ? '2-digit' : 'numeric'
   const options = buildDateOptions(show, digit)

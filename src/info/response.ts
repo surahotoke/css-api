@@ -1,5 +1,5 @@
 import type { Context } from 'hono'
-import { BASE, MINUTE, HOUR, DAY } from '../constants'
+import { BASE, MINUTE, HOUR, DAY, SUCCESS_CODE } from '../constants'
 
 function dataToSvgSize(value: number, status: number): { width: number; height: number } {
   return {
@@ -8,14 +8,25 @@ function dataToSvgSize(value: number, status: number): { width: number; height: 
   }
 }
 
-export function infoResponse(c: Context<{ Bindings: Env }>, value: number, status: number = 200, cacheControl = 'no-store'): Response {
+export function infoResponse(
+  c: Context<{ Bindings: Env }>,
+  value: number,
+  status: number = SUCCESS_CODE.OK,
+  cacheControl = 'no-store',
+): Response {
   const { width, height } = dataToSvgSize(value, status)
   c.header('content-type', 'image/svg+xml')
   c.header('cache-control', cacheControl)
   return c.body(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"></svg>`)
 }
 
-export function clockResponse(c: Context<{ Bindings: Env }>, hour: number, minute: number, second: number, status: number = 200): Response {
+export function clockResponse(
+  c: Context<{ Bindings: Env }>,
+  hour: number,
+  minute: number,
+  second: number,
+  status: number = SUCCESS_CODE.OK,
+): Response {
   const minuteSecond = minute * MINUTE + second
   const width = minuteSecond
   const height = hour * 900 + (status - 100)
