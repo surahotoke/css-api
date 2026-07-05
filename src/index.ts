@@ -3,7 +3,7 @@ import { cookie } from './cookie'
 import { heartbeat } from './heartbeat'
 import { info } from './info'
 import { view } from './view'
-import { JIG_STOCK_SYMBOL, fetchStockValue } from './info/stock'
+import { JIG_STOCK_SYMBOL, fetchStockOpen } from './stock'
 import home from './home.html'
 
 const app = new Hono<{ Bindings: Env }>()
@@ -22,6 +22,6 @@ export default {
   fetch: app.fetch,
   async scheduled(controller: ScheduledController, env: Env) {
     const now = new Date(controller.scheduledTime)
-    await fetchStockValue(env, JIG_STOCK_SYMBOL, 'open', now)
+    await fetchStockOpen(env, JIG_STOCK_SYMBOL, now)
   },
 } satisfies ExportedHandler<Env>

@@ -17,7 +17,13 @@ export const HOUR_MS = HOUR * SECOND_MS
 export const DAY_MS = DAY * SECOND_MS
 export const WEEK_MS = WEEK * SECOND_MS
 
-/** リアルタイム性が重要なデータ（在庫、為替など） */
+/**
+ * リアルタイム性が重要なデータ（在庫、為替など）
+ *
+ * Workers KV の expirationTtl は最小60秒。
+ * これ未満に縮めると KV.put が例外を投げるので注意。
+ * https://developers.cloudflare.com/kv/api/write-key-value-pairs/#expiring-keys
+ */
 export const CACHE_SHORT = MINUTE
 
 /** 通常のデータ（天気、ニュースなど） */

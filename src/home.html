@@ -206,9 +206,9 @@
     <p class="eg"><code>/info/weather/pressure</code> → 1013</p>
   </section>
 
-    <section>
+  <section>
     <h3><code>/info/stock/open/:symbol</code></h3>
-    <p>指定銘柄の始値。東証は <code>.T</code> を付ける（例: 5244.T）。</p>
+    <p>指定銘柄の始値。東証は <code>.T</code> を付ける（例: 5244.T）。始値は確定後、翌9:05までキャッシュされる。</p>
     <dl>
       <dt>:symbol</dt><dd>銘柄コード（パス）。例: 5244.T</dd>
     </dl>
@@ -218,7 +218,7 @@
 
   <section>
     <h3><code>/info/stock/high/:symbol</code></h3>
-    <p>指定銘柄の高値。取引時間中はキャッシュされない。</p>
+    <p>指定銘柄の高値。取引時間中は最大1分キャッシュ。時間外はキャッシュされる。</p>
     <dl>
       <dt>:symbol</dt><dd>銘柄コード（パス）。例: 5244.T</dd>
     </dl>
@@ -228,7 +228,7 @@
 
   <section>
     <h3><code>/info/stock/low/:symbol</code></h3>
-    <p>指定銘柄の安値。取引時間中はキャッシュされない。</p>
+    <p>指定銘柄の安値。取引時間中は最大1分キャッシュ。時間外はキャッシュされる。</p>
     <dl>
       <dt>:symbol</dt><dd>銘柄コード（パス）。例: 5244.T</dd>
     </dl>
@@ -238,7 +238,7 @@
 
   <section>
     <h3><code>/info/stock/close/:symbol</code></h3>
-    <p>指定銘柄の終値。取引時間中はキャッシュされない。</p>
+    <p>指定銘柄の終値。取引時間中は最大1分キャッシュ。時間外はキャッシュされる。</p>
     <dl>
       <dt>:symbol</dt><dd>銘柄コード（パス）。例: 5244.T</dd>
     </dl>
@@ -291,6 +291,17 @@
     </dl>
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>/view/weather/now?show=weather,temperature,humidity</code> → 快晴 23℃ 湿度81%</p>
+  </section>
+
+  <section>
+    <h3><code>/view/stock/:symbol</code></h3>
+    <p>指定銘柄の株価を、人が読めるテキスト画像で返す。show で表示要素を選べる。取引時間中は最大1分キャッシュ。時間外はキャッシュされる。</p>
+    <dl>
+      <dt>:symbol</dt><dd>銘柄コード（パス）。東証は <code>.T</code> を付ける（例: 5244.T）</dd>
+      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（open, high, low, close）。all を指定すると全要素。省略時は close。</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/view/stock/5244.T?show=all</code> → 始値171円 高値174円 安値170円 終値173円</p>
   </section>
 
   <footer>
