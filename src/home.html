@@ -234,7 +234,7 @@
       <dd>その単位を絶対値でセット。day は曜日（Mon〜Sun）。優先度は date &gt; week &gt; day。</dd>
       <dt>addyear / addmonth / addweek / adddate / addhour / addminute / addsecond</dt>
       <dd>その単位を相対的に加減算（負も可）。</dd>
-      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（year,month,date,day,hour,minute,second）。省略時は年月日時分。</dd>
+      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（year,month,date,day,hour,minute,second）。all を指定すると全要素。省略時は年月日時分。</dd>
       <dt>fmt</dt><dd>書式ロケール（例 ja-JP, en-US, sv-SE）。省略時はブラウザの言語。</dd>
       <dt>pad</dt><dd>付けると月日時分秒をゼロ埋め（2桁）にする。</dd>
     </dl>
@@ -247,7 +247,7 @@
     <p>現在の天気を、人が読めるテキスト画像で返す。show で表示要素を選べる。</p>
     <dl>
       <dt>lat / lon</dt><dd>緯度・経度（省略時はアクセス元の現在地）</dd>
-      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（weather-code, weather, temperature, apparent-temperature, humidity, precipitation, probability, wind-speed, pressure）。省略時は weather, temperature, humidity。</dd>
+      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（weather-code, weather, temperature, apparent-temperature, humidity, precipitation, probability, wind-speed, pressure）。all を指定すると全要素。省略時は weather, temperature, humidity。</dd>
     </dl>
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>/view/weather/now?show=weather,temperature,humidity</code> → 快晴 23℃ 湿度81%</p>
