@@ -1,5 +1,5 @@
 import type { Context } from 'hono'
-import { DEFAULT_TIMEZONE, DEFAULT_LOCALE, WEEKDAYS } from './constants'
+import { DEFAULT_TIMEZONE, DEFAULT_LOCALE, WEEKDAYS } from '../constants'
 
 export function getTimezone(c: Context<{ Bindings: Env }>): string {
   return (c.req.raw.cf?.timezone as string) ?? DEFAULT_TIMEZONE

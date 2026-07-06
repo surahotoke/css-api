@@ -1,11 +1,11 @@
 import { Hono } from 'hono'
 import { WEEKDAYS, ERROR_CODE } from '../constants'
-import { getTimezone, getFmtLocale, getNowParts, shiftDate, buildDateOptions } from '../datetime'
-import { viewTextResponse, errorResponse } from './response'
+import { getTimezone, getFmtLocale, getNowParts, shiftDate, buildDateOptions } from './common'
+import { viewTextResponse, errorResponse } from '../response/view'
 
-export const datetime = new Hono<{ Bindings: Env }>()
+export const view = new Hono<{ Bindings: Env }>()
 
-datetime.get('/now', (c) => {
+view.get('/now', (c) => {
   const now = new Date()
   const nowParts = getNowParts(now, getTimezone(c))
 

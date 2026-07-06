@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
 import { ERROR_CODE } from '../constants'
-import { fetchStockQuote, fetchStockOpen, type StockField } from '../stock'
-import { viewTextResponse, errorResponse } from './response'
+import { fetchStockQuote, fetchStockOpen, type StockField } from './common'
+import { viewTextResponse, errorResponse } from '../response/view'
 
-export const stock = new Hono<{ Bindings: Env }>()
+export const view = new Hono<{ Bindings: Env }>()
 
 const VALID_FIELDS = ['open', 'high', 'low', 'close']
 
@@ -14,7 +14,7 @@ const FIELD_LABEL: Record<StockField, string> = {
   close: '終値',
 }
 
-stock.get('/:symbol', async (c) => {
+view.get('/:symbol', async (c) => {
   const now = new Date()
   const symbol = c.req.param('symbol')
 

@@ -1,5 +1,5 @@
 import { waitUntil } from 'cloudflare:workers'
-import { CACHE_SHORT, SECOND_MS } from './constants'
+import { CACHE_SHORT, SECOND_MS } from '../constants'
 
 /** JIG.jp の株価銘柄コード（東証） */
 export const JIG_STOCK_SYMBOL = '5244.T'

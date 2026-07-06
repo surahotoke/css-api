@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { getCookie, setCookie } from 'hono/cookie'
 import { COOKIE_OPT } from './constants'
-import { viewTextResponse } from './view/response'
+import { viewTextResponse } from './response/view'
 
 export const heartbeat = new Hono<{ Bindings: Env }>()
 

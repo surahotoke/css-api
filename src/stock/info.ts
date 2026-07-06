@@ -1,11 +1,11 @@
 import { Hono } from 'hono'
 import { ERROR_CODE } from '../constants'
-import { fetchStockQuote, fetchStockOpen } from '../stock'
-import { infoResponse, errorResponse } from './response'
+import { fetchStockQuote, fetchStockOpen } from './common'
+import { infoResponse, errorResponse } from '../response/info'
 
-export const stock = new Hono<{ Bindings: Env }>()
+export const info = new Hono<{ Bindings: Env }>()
 
-stock.get('/open/:symbol', async (c) => {
+info.get('/open/:symbol', async (c) => {
   const now = new Date()
   const symbol = c.req.param('symbol')
   const value = await fetchStockOpen(c.env, symbol, now)
@@ -13,7 +13,7 @@ stock.get('/open/:symbol', async (c) => {
   return infoResponse(c, value)
 })
 
-stock.get('/high/:symbol', async (c) => {
+info.get('/high/:symbol', async (c) => {
   const now = new Date()
   const symbol = c.req.param('symbol')
   const quote = await fetchStockQuote(c.env, symbol, now)
@@ -21,7 +21,7 @@ stock.get('/high/:symbol', async (c) => {
   return infoResponse(c, quote.high)
 })
 
-stock.get('/low/:symbol', async (c) => {
+info.get('/low/:symbol', async (c) => {
   const now = new Date()
   const symbol = c.req.param('symbol')
   const quote = await fetchStockQuote(c.env, symbol, now)
@@ -29,7 +29,7 @@ stock.get('/low/:symbol', async (c) => {
   return infoResponse(c, quote.low)
 })
 
-stock.get('/close/:symbol', async (c) => {
+info.get('/close/:symbol', async (c) => {
   const now = new Date()
   const symbol = c.req.param('symbol')
   const quote = await fetchStockQuote(c.env, symbol, now)

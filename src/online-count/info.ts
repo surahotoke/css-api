@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
-import { infoResponse } from './response'
+import { infoResponse } from '../response/info'
 
-export const onlineCount = new Hono<{ Bindings: Env }>()
+export const info = new Hono<{ Bindings: Env }>()
 
-onlineCount.get('/', async (c) => {
+info.get('/', async (c) => {
   const online = await c.env.PRESENCE.getByName('global').peek(Date.now())
   return infoResponse(c, online)
 })

@@ -1,10 +1,10 @@
 import { Hono } from 'hono'
 import { VALUE_MAX, ERROR_CODE } from '../constants'
-import { infoResponse, errorResponse } from './response'
+import { infoResponse, errorResponse } from '../response/info'
 
-export const random = new Hono<{ Bindings: Env }>()
+export const info = new Hono<{ Bindings: Env }>()
 
-random.get('/', (c) => {
+info.get('/', (c) => {
   const fromRaw = c.req.query('from')
   const toRaw = c.req.query('to')
   const from = fromRaw === undefined ? 0 : Math.round(Number(fromRaw))

@@ -1,11 +1,11 @@
 import { Hono } from 'hono'
 import { ERROR_CODE } from '../constants'
-import { fetchWeather, weatherCodeToText } from '../weather'
-import { viewTextResponse, errorResponse } from './response'
+import { fetchWeather, weatherCodeToText } from './common'
+import { viewTextResponse, errorResponse } from '../response/view'
 
-export const weather = new Hono<{ Bindings: Env }>()
+export const view = new Hono<{ Bindings: Env }>()
 
-weather.get('/now', async (c) => {
+view.get('/now', async (c) => {
   const data = await fetchWeather(c)
   if (!data) return errorResponse(c, ERROR_CODE.BAD_GATEWAY)
 

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
 import { COOKIE_OPT, VALUE_MAX, ERROR_CODE } from './constants'
-import { infoResponse, errorResponse } from './info/response'
+import { infoResponse, errorResponse } from './response/info'
 
 export const cookie = new Hono<{ Bindings: Env }>()
 
