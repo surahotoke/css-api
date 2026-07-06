@@ -1,6 +1,6 @@
-import type { Context } from 'hono'
 import { waitUntil } from 'cloudflare:workers'
 import { CACHE_MEDIUM } from '../constants'
+import type { Context } from 'hono'
 
 const cache = caches.default
 

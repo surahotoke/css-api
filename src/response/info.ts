@@ -1,5 +1,5 @@
-import type { Context } from 'hono'
 import { BASE, MINUTE, HOUR, DAY, SUCCESS_CODE } from '../constants'
+import type { Context } from 'hono'
 
 function dataToSvgSize(value: number, status: number): { width: number; height: number } {
   return {

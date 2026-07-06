@@ -1,5 +1,5 @@
-import type { Context } from 'hono'
 import { STATUS_TEXT } from '../constants'
+import type { Context } from 'hono'
 
 function textToCh(text: string): number {
   let total = 0
