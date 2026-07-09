@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { cookie } from './cookie'
+import { cookie } from './cookie/index'
 import { heartbeat } from './heartbeat'
 import { info as datetimeInfo } from './datetime/info'
 import { view as datetimeView } from './datetime/view'

@@ -55,22 +55,24 @@
 
   <h2>cookie</h2>
 
+  <h2>cookie</h2>
+
   <section>
-    <h3><code>/cookie/get/:name</code></h3>
-    <p>cookie の値を読んで返す。</p>
+    <h3><code>/cookie/view/:name</code></h3>
+    <p>cookie の値をテキスト画像で返す。数値でなくても、範囲外でもそのまま表示する。存在しなければ 404。</p>
     <dl>
       <dt>:name</dt><dd>cookie 名（パス）</dd>
     </dl>
     <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/get/score</code> → score という cookie を読む</p>
+    <p class="eg"><code>/cookie/view/name</code> → name の中身をそのまま表示</p>
   </section>
 
   <section>
     <h3><code>/cookie/set/:name</code></h3>
-    <p>cookie に値を書き込む。</p>
+    <p>cookie に値を書き込む（上書き）。</p>
     <dl>
       <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>value</dt><dd>書き込む値</dd>
+      <dt>value</dt><dd>書き込む値（省略時は空文字）</dd>
     </dl>
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>/cookie/set/score?value=100</code> → score に 100 を書き込む</p>
@@ -84,6 +86,86 @@
     </dl>
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>/cookie/delete/score</code> → score を削除する</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/number/get/:name</code></h3>
+    <p>cookie の値を数値として読んで返す。数値でない、または 0〜999999 の範囲外なら 404。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/number/get/score</code> → score を数値で読む</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/number/add/:name</code></h3>
+    <p>cookie の値に数値を加算する。存在しなければ 0 を基準に加算する。既存値または加算値が数値として読めなければ 400。範囲制限はなく、値はそのまま保持される。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>加算する数値（省略時は 1）。負も可</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/number/add/count</code> → count を 1 増やす</p>
+    <p class="eg"><code>/cookie/number/add/count?value=10</code> → count を 10 増やす</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/list/push/:name</code></h3>
+    <p>cookie を「,」区切りのリストとみなし、末尾に要素を追加する。既存が空（または存在しない）ときは区切りなしでそのまま書く。value 未指定なら何もしない。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>追加する要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/push/fruits?value=apple</code> → apple を追加（apple → apple,banana → ...）</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/list/remove/:name</code></h3>
+    <p>「,」区切りリストから要素を 1 つ取り除く。value か index のどちらか一方を指定する（両方・皆無は 400）。value 指定なら最初に一致した要素、index 指定ならその位置（0 始まり、負で末尾から）。対象がなければ 404。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>取り除く要素（値で指定）</dd>
+      <dt>index</dt><dd>取り除く位置（0 始まり、負で末尾から）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/remove/fruits?value=banana</code> → banana を取り除く</p>
+    <p class="eg"><code>/cookie/list/remove/fruits?index=-1</code> → 末尾を取り除く</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/list/includes/:name</code></h3>
+    <p>「,」区切りリストに指定要素が含まれるかを 1（あり）/ 0（なし）で返す。完全一致で判定する（部分一致しない）。value 未指定なら 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>探す要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/includes/fruits?value=banana</code> → 含めば 1、なければ 0</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/list/index/:name</code></h3>
+    <p>「,」区切りリスト内で指定要素が何番目かを返す（0 始まり）。見つからなければ 404。value 未指定なら 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>位置を調べる要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/index/fruits?value=banana</code> → apple,banana なら 1</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/list/at/:name</code></h3>
+    <p>「,」区切りリストの指定位置の要素をテキスト画像で返す。位置は 0 始まり、負なら末尾から（-1 が最後）。範囲外なら 404、index が数値でなければ 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>index</dt><dd>取り出す位置（0 始まり、負で末尾から）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/at/fruits?index=1</code> → apple,banana なら banana</p>
+    <p class="eg"><code>/cookie/list/at/fruits?index=-1</code> → 最後の要素</p>
   </section>
 
   <h2>heartbeat</h2>
