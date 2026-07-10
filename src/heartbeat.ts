@@ -6,11 +6,12 @@ import { viewTextResponse } from './response/view'
 export const heartbeat = new Hono<{ Bindings: Env }>()
 
 heartbeat.get('/', async (c) => {
+  const now = new Date()
   let uuid = getCookie(c, 'uuid')
   if (!uuid) {
     uuid = crypto.randomUUID()
     setCookie(c, 'uuid', uuid, COOKIE_OPT)
   }
-  const online = await c.env.PRESENCE.getByName('global').heartbeat(uuid, Date.now())
+  const online = await c.env.PRESENCE.getByName('global').heartbeat(uuid, now.getTime())
   return viewTextResponse(c, `Online: ${online}`)
 })

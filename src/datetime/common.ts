@@ -1,4 +1,4 @@
-import { DEFAULT_TIMEZONE, DEFAULT_LOCALE, WEEKDAYS } from '../constants'
+import { DEFAULT_TIMEZONE, DEFAULT_FMT_LOCALE, DEFAULT_LOCALE, WEEKDAYS } from '../constants'
 import type { Context } from 'hono'
 
 export function getTimezone(c: Context<{ Bindings: Env }>): string {
@@ -10,8 +10,8 @@ export function getFmtLocale(c: Context<{ Bindings: Env }>): string {
 }
 
 export function getNowParts(date: Date, timezone: string = DEFAULT_TIMEZONE) {
-  const today = new Intl.DateTimeFormat('sv-SE', { timeZone: timezone }).format(date)
-  const parts = new Intl.DateTimeFormat('sv-SE', {
+  const today = new Intl.DateTimeFormat(DEFAULT_FMT_LOCALE, { timeZone: timezone }).format(date)
+  const parts = new Intl.DateTimeFormat(DEFAULT_FMT_LOCALE, {
     timeZone: timezone,
     year: 'numeric',
     month: '2-digit',

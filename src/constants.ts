@@ -1,4 +1,5 @@
 export const DEFAULT_TIMEZONE = 'Asia/Tokyo'
+export const DEFAULT_FMT_LOCALE = 'sv-SE'
 export const DEFAULT_LOCALE = 'ja-JP'
 
 export const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']

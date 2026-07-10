@@ -4,6 +4,7 @@ import { infoResponse } from '../response/info'
 export const info = new Hono<{ Bindings: Env }>()
 
 info.get('/', async (c) => {
-  const online = await c.env.PRESENCE.getByName('global').peek(Date.now())
+  const now = new Date()
+  const online = await c.env.PRESENCE.getByName('global').peek(now.getTime())
   return infoResponse(c, online)
 })
