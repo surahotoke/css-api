@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { WEEKDAYS, ERROR_CODE } from '../constants'
-import { getTimezone, getFmtLocale, getNowParts, shiftDate, buildDateOptions } from './common'
+import { getTimezone, getLocale, getNowParts, shiftDate, buildDateOptions } from './common'
 import { viewTextResponse, errorResponse } from '../response/view'
 
 export const view = new Hono<{ Bindings: Env }>()
@@ -44,7 +44,7 @@ view.get('/now', (c) => {
   const digit = c.req.query('pad') !== undefined ? '2-digit' : 'numeric'
   const options = buildDateOptions(show, digit)
 
-  const fmtDate = shiftDate(c, nowParts)
-  const text = new Intl.DateTimeFormat(getFmtLocale(c), options).format(fmtDate)
+  const shiftedDate = shiftDate(c, nowParts)
+  const text = new Intl.DateTimeFormat(getLocale(c), options).format(shiftedDate)
   return viewTextResponse(c, text)
 })

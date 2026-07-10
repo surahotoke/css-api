@@ -1,17 +1,20 @@
-import { DEFAULT_TIMEZONE, DEFAULT_FMT_LOCALE, DEFAULT_LOCALE, WEEKDAYS } from '../constants'
+import { DEFAULT_TIMEZONE, FMT_LOCALE, DEFAULT_LOCALE, WEEKDAYS } from '../constants'
 import type { Context } from 'hono'
 
+/** アクセス元のタイムゾーンを返す（取得できなければ既定のタイムゾーン） */
 export function getTimezone(c: Context<{ Bindings: Env }>): string {
   return (c.req.raw.cf?.timezone as string) ?? DEFAULT_TIMEZONE
 }
 
-export function getFmtLocale(c: Context<{ Bindings: Env }>): string {
+/** 表示用ロケールを返す（fmt クエリ → Accept-Language → 既定ロケールの順で採用） */
+export function getLocale(c: Context<{ Bindings: Env }>): string {
   return c.req.query('fmt') || c.req.header('Accept-Language')?.split(',')[0]?.trim() || DEFAULT_LOCALE
 }
 
-export function getNowParts(date: Date, timezone: string = DEFAULT_TIMEZONE) {
-  const today = new Intl.DateTimeFormat(DEFAULT_FMT_LOCALE, { timeZone: timezone }).format(date)
-  const parts = new Intl.DateTimeFormat(DEFAULT_FMT_LOCALE, {
+/** 指定タイムゾーンにおける現在日時を、年・月・日・曜日・時・分・秒に分解して返す（曜日は月曜が 0） */
+export function getNowParts(now: Date, timezone: string = DEFAULT_TIMEZONE) {
+  const today = new Intl.DateTimeFormat(FMT_LOCALE, { timeZone: timezone }).format(now)
+  const parts = new Intl.DateTimeFormat(FMT_LOCALE, {
     timeZone: timezone,
     year: 'numeric',
     month: '2-digit',
@@ -19,7 +22,7 @@ export function getNowParts(date: Date, timezone: string = DEFAULT_TIMEZONE) {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-  }).formatToParts(date)
+  }).formatToParts(now)
   const part = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0)
   return {
     year: part('year'),
@@ -34,6 +37,7 @@ export function getNowParts(date: Date, timezone: string = DEFAULT_TIMEZONE) {
 
 export type NowParts = ReturnType<typeof getNowParts>
 
+/** 現在日時（nowParts）を基準に、クエリの set/add 系パラメータで年月日時分秒をずらした Date を返す */
 export function shiftDate(c: Context<{ Bindings: Env }>, nowParts: NowParts): Date {
   const num = (name: string): number | undefined => {
     const raw = c.req.query(name)
@@ -98,6 +102,7 @@ export function shiftDate(c: Context<{ Bindings: Env }>, nowParts: NowParts): Da
   return shifted
 }
 
+/** 表示する項目名の配列から、Intl.DateTimeFormat 用のオプションを組み立てる */
 export function buildDateOptions(fields: string[], digit: '2-digit' | 'numeric'): Intl.DateTimeFormatOptions {
   const options: Intl.DateTimeFormatOptions = { timeZone: 'UTC' }
   for (const field of fields) {
@@ -126,4 +131,18 @@ export function buildDateOptions(fields: string[], digit: '2-digit' | 'numeric')
     }
   }
   return options
+}
+
+/** 時刻を JST の絶対時刻（+09:00 付き ISO）で返す */
+export function toJst(date: Date): string {
+  const jst = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: DEFAULT_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(date.getTime())
+  return `${jst.replace(' ', 'T')}+09:00`
 }

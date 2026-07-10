@@ -1,5 +1,5 @@
 export const DEFAULT_TIMEZONE = 'Asia/Tokyo'
-export const DEFAULT_FMT_LOCALE = 'sv-SE'
+export const FMT_LOCALE = 'sv-SE'
 export const DEFAULT_LOCALE = 'ja-JP'
 
 export const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -46,6 +46,16 @@ export const SUCCESS_CODE = {
   MULTI_STATUS: 207,
   ALREADY_REPORTED: 208,
   IM_USED: 226,
+} as const
+
+export const REDIRECT_CODE = {
+  MULTIPLE_CHOICES: 300,
+  MOVED_PERMANENTLY: 301,
+  FOUND: 302,
+  SEE_OTHER: 303,
+  NOT_MODIFIED: 304,
+  TEMPORARY_REDIRECT: 307,
+  PERMANENT_REDIRECT: 308,
 } as const
 
 export const ERROR_CODE = {
