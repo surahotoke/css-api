@@ -1,6 +1,9 @@
 import { STATUS_TEXT } from '../constants'
 import type { Context } from 'hono'
 
+/** SVG テキスト描画の等幅フォント。generic monospace は環境によって全角:半角=2:1 でないフォント（Osaka等）に解決されるため明示する */
+export const DEFAULT_MONOSPACE = 'Menlo, Consolas, monospace'
+
 /** テキストを XML/SVG に埋め込める形にエスケープする */
 export function escapeXml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -8,7 +11,7 @@ export function escapeXml(text: string): string {
 
 function textToCh(text: string): number {
   let total = 0
-  for (const ch of text) total += (ch.codePointAt(0) ?? 0) > 0xff ? 1.6 : 1
+  for (const ch of text) total += (ch.codePointAt(0) ?? 0) > 0xff ? 1.85 : 1
   return total
 }
 
@@ -54,7 +57,7 @@ export function viewTextResponse(c: Context<{ Bindings: Env }>, text: string, ca
     .split('\n')
     .map((line, i) => `<tspan x="0" dy="${i === 0 ? '1em' : '1.2em'}">${line || ' '}</tspan>`)
     .join('')
-  return viewResponse(c, width, height, `<text x="0">${tspans}</text>`, 'font-family="monospace"', cacheControl)
+  return viewResponse(c, width, height, `<text x="0">${tspans}</text>`, `font-family="${DEFAULT_MONOSPACE}"`, cacheControl)
 }
 
 export function errorResponse(c: Context<{ Bindings: Env }>, errorCode: number, cacheControl = 'no-store'): Response {
