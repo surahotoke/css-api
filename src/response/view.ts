@@ -8,7 +8,7 @@ export function escapeXml(text: string): string {
 
 function textToCh(text: string): number {
   let total = 0
-  for (const ch of text) total += (ch.codePointAt(0) ?? 0) > 0xff ? 2 : 1
+  for (const ch of text) total += (ch.codePointAt(0) ?? 0) > 0xff ? 1.6 : 1
   return total
 }
 
@@ -32,7 +32,19 @@ export function viewResponse(
 ): Response {
   c.header('content-type', 'image/svg+xml')
   c.header('cache-control', cacheControl)
-  return c.body(`<svg xmlns="http://www.w3.org/2000/svg" ${attrs} width="${width}" height="${height}">${content}</svg>`)
+  return c.body(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}${attrs ? ` ${attrs}` : ''}">${content}</svg>`)
+}
+
+/** HTML を foreignObject の root div で包み、SVG 画像として返す（viewResponse の特殊版） */
+export function viewHtmlResponse(
+  c: Context<{ Bindings: Env }>,
+  width: number | string,
+  height: number | string,
+  html: string,
+  cacheControl = 'no-store',
+): Response {
+  const content = `<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" root>${html}</div></foreignObject>`
+  return viewResponse(c, width, height, content, '', cacheControl)
 }
 
 /** プレーンテキストを monospace のテキスト画像として返す（viewResponse の特殊版） */
