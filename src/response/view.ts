@@ -21,7 +21,7 @@ export function viewTextResponse(c: Context<{ Bindings: Env }>, text: string, ca
   const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
   const tspans = escaped
     .split('\n')
-    .map((line, i) => `<tspan x="0" dy="${i === 0 ? '1em' : '1.2em'}">${line}</tspan>`)
+    .map((line, i) => `<tspan x="0" dy="${i === 0 ? '1em' : '1.2em'}">${line || ' '}</tspan>`)
     .join('')
   c.header('content-type', 'image/svg+xml')
   c.header('cache-control', cacheControl)
