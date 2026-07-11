@@ -4,12 +4,13 @@ import { setCookie } from 'hono/cookie'
 import { sql } from 'kysely'
 import { COOKIE_OPT, ERROR_CODE } from '../constants'
 import { getDb } from '../db'
-import { refererRedirect } from '../response/post'
+import { getRefererOrThrow, refererRedirect } from '../response/post'
 import { NAME_PATTERN, COMMENT_MAX, COMMENT_NAME_COOKIE, getName } from './common'
 
 export const post = new Hono<{ Bindings: Env }>()
 
 post.post('/', async (c) => {
+  getRefererOrThrow(c)
   const form = await c.req.formData()
   const comment = String(form.get('comment') ?? '')
     .normalize('NFC')
@@ -23,6 +24,7 @@ post.post('/', async (c) => {
 })
 
 post.post('/rename', async (c) => {
+  getRefererOrThrow(c)
   const form = await c.req.formData()
   const name = String(form.get('rename') ?? '')
     .normalize('NFC')
