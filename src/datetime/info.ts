@@ -1,14 +1,15 @@
 import { Hono } from 'hono'
 import { HOUR, MINUTE } from '../constants'
 import { getTimezone, getNowFields } from './common'
-import { infoResponse, clockResponse } from '../response/info'
+import { infoResponse } from '../response/info'
+import { infoClockResponse } from './response'
 
 export const info = new Hono<{ Bindings: Env }>()
 
 info.get('/clock', (c) => {
   const now = new Date()
   const nowFields = getNowFields(now, getTimezone(c))
-  return clockResponse(c, nowFields.hour, nowFields.minute, nowFields.second)
+  return infoClockResponse(c, nowFields.hour, nowFields.minute, nowFields.second)
 })
 
 info.get('/current-time', (c) => {

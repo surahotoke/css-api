@@ -3,6 +3,7 @@ import { sql } from 'kysely'
 import { getDb } from '../db'
 import { getDateTimeFormatYMDhm } from '../datetime/common'
 import { viewTextResponse } from '../response/view'
+import { viewListResponse } from './response'
 import { LIST_LIMIT, getName } from './common'
 
 export const view = new Hono<{ Bindings: Env }>()
@@ -16,8 +17,12 @@ view.get('/list', async (c) => {
     LIMIT ${LIST_LIMIT}
   `.execute(db)
   const dtf = getDateTimeFormatYMDhm(c)
-  const text = result.rows.map((row) => `${dtf.format(new Date(row.created_at))}\n${row.name}： ${row.comment}`).join('\n\n')
-  return viewTextResponse(c, text)
+  const rows = result.rows.map((row) => ({
+    name: row.name,
+    comment: row.comment,
+    createdAt: dtf.format(new Date(row.created_at)),
+  }))
+  return viewListResponse(c, rows)
 })
 
 view.get('/name', (c) => {

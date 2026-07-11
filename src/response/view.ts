@@ -1,6 +1,11 @@
 import { STATUS_TEXT } from '../constants'
 import type { Context } from 'hono'
 
+/** テキストを XML/SVG に埋め込める形にエスケープする */
+export function escapeXml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+}
+
 function textToCh(text: string): number {
   let total = 0
   for (const ch of text) total += (ch.codePointAt(0) ?? 0) > 0xff ? 2 : 1
@@ -16,18 +21,28 @@ function textToSize(text: string): { width: string; height: string } {
   }
 }
 
+/** 任意の SVG コンテンツを画像として返す（view チャンネルの本流） */
+export function viewResponse(
+  c: Context<{ Bindings: Env }>,
+  width: number | string,
+  height: number | string,
+  content: string,
+  attrs = '',
+  cacheControl = 'no-store',
+): Response {
+  c.header('content-type', 'image/svg+xml')
+  c.header('cache-control', cacheControl)
+  return c.body(`<svg xmlns="http://www.w3.org/2000/svg" ${attrs} width="${width}" height="${height}">${content}</svg>`)
+}
+
+/** プレーンテキストを monospace のテキスト画像として返す（viewResponse の特殊版） */
 export function viewTextResponse(c: Context<{ Bindings: Env }>, text: string, cacheControl = 'no-store'): Response {
   const { width, height } = textToSize(text)
-  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
-  const tspans = escaped
+  const tspans = escapeXml(text)
     .split('\n')
     .map((line, i) => `<tspan x="0" dy="${i === 0 ? '1em' : '1.2em'}">${line || ' '}</tspan>`)
     .join('')
-  c.header('content-type', 'image/svg+xml')
-  c.header('cache-control', cacheControl)
-  return c.body(
-    `<svg xmlns="http://www.w3.org/2000/svg" font-family="monospace" width="${width}" height="${height}"><text x="0">${tspans}</text></svg>`,
-  )
+  return viewResponse(c, width, height, `<text x="0">${tspans}</text>`, 'font-family="monospace"', cacheControl)
 }
 
 export function errorResponse(c: Context<{ Bindings: Env }>, errorCode: number, cacheControl = 'no-store'): Response {
