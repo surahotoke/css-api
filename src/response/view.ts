@@ -32,7 +32,7 @@ export function viewResponse(
 ): Response {
   c.header('content-type', 'image/svg+xml')
   c.header('cache-control', cacheControl)
-  return c.body(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}${attrs ? ` ${attrs}` : ''}">${content}</svg>`)
+  return c.body(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"${attrs ? ` ${attrs}` : ''}>${content}</svg>`)
 }
 
 /** HTML を foreignObject の root div で包み、SVG 画像として返す（viewResponse の特殊版） */
