@@ -43,7 +43,7 @@ export function viewHtmlResponse(
   html: string,
   cacheControl = 'no-store',
 ): Response {
-  const content = `<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" root>${html}</div></foreignObject>`
+  const content = `<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" root="">${html}</div></foreignObject>`
   return viewResponse(c, width, height, content, '', cacheControl)
 }
 
