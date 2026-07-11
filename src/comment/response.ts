@@ -4,12 +4,12 @@ import type { Context } from 'hono'
 
 export type CommentRow = { name: string; comment: string; createdAt: string }
 
-/** 折り返し見積もりの1行あたり容量。全角=2units・半角=1.2units、1unit=0.5em */
+/** 折り返し見積もりの1行あたり容量。全角=2.1units・半角=1.2units、1unit=0.5em */
 const LINE_CAPACITY = Math.floor(CONTENT_WIDTH / (BODY_FONT_SIZE * 0.5))
 
 function textToUnits(text: string): number {
   let total = 0
-  for (const ch of text) total += (ch.codePointAt(0) ?? 0) > 0xff ? 2 : 1.2
+  for (const ch of text) total += (ch.codePointAt(0) ?? 0) > 0xff ? 2.1 : 1.2
   return total
 }
 

@@ -25,6 +25,7 @@ export const STYLE = /*css*/ `
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    gap: 8px;
     line-height: ${LINE_HEIGHT}px;
   }
 
@@ -32,6 +33,10 @@ export const STYLE = /*css*/ `
     font-weight: bold;
     color: #222;
     font-size: ${BODY_FONT_SIZE}px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-fit: shrink;
   }
 
   span.dt {
