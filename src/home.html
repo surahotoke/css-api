@@ -51,9 +51,7 @@
 <body>
 
   <h1>css-api</h1>
-  <p class="lead">CSS から読み取るためのデータを SVG として返す API。値は SVG の寸法に、表示用テキストは画像として返す。</p>
-
-  <h2>cookie</h2>
+  <p class="lead">CSS から読み取るためのデータを SVG として返す API。値は SVG の寸法に、表示用テキストは画像として返す。フォームの POST も受け付ける。</p>
 
   <h2>cookie</h2>
 
@@ -384,6 +382,45 @@
     </dl>
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>/view/stock/5244.T?show=all</code> → 始値171円 高値174円 安値170円 終値173円</p>
+  </section>
+
+  <section>
+    <h3><code>/view/comment/list</code></h3>
+    <p>コメント一覧の最新20件を、デザインされた画像で返す。名前・日時・本文を表示し、本文は自動折り返し。日時は見る人のタイムゾーンで表示される。0件のときは「まだコメントはありません」と表示。</p>
+    <dl>
+      <dt>fmt</dt><dd>日時の書式ロケール（例 ja-JP, en-US）。省略時はブラウザの言語。</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/view/comment/list</code> → 最新20件のコメント一覧</p>
+  </section>
+
+  <section>
+    <h3><code>/view/comment/name</code></h3>
+    <p>現在の投稿者名をテキスト画像で返す。未設定なら「名無し」。</p>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/view/comment/name</code> → 投稿者名を表示する</p>
+  </section>
+
+  <h2>post</h2>
+
+  <section>
+    <h3><code>/post/comment</code></h3>
+    <p>コメントを投稿する。フォームの action 先として使う。投稿者名は cookie に保存された名前（未設定なら名無し）。成功すると referer へ 303 リダイレクトで戻る（referer 必須）。</p>
+    <dl>
+      <dt>comment</dt><dd>本文（フォームフィールド）。280文字以内。</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>&lt;form action="/post/comment" method="post"&gt;</code> に <code>name="comment"</code> の textarea を置いて送信</p>
+  </section>
+
+  <section>
+    <h3><code>/post/comment/rename</code></h3>
+    <p>コメントの投稿者名を変更する。名前は cookie に保存され、以後の投稿に使われる。成功すると referer へ 303 リダイレクトで戻る（referer 必須）。</p>
+    <dl>
+      <dt>rename</dt><dd>新しい名前（フォームフィールド）。24文字以内。文字・数字と ・ . _ - が使える。</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>&lt;form action="/post/comment/rename" method="post"&gt;</code> に <code>name="rename"</code> の input を置いて送信</p>
   </section>
 
   <footer>
