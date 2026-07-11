@@ -14,15 +14,7 @@ export function getLocale(c: Context<{ Bindings: Env }>): string {
 /** 指定タイムゾーンにおける現在日時を、年・月・日・曜日・時・分・秒に分解して返す（曜日は月曜が 0） */
 export function getNowFields(now: Date, timezone: string = DEFAULT_TIMEZONE) {
   const today = new Intl.DateTimeFormat(FMT_LOCALE, { timeZone: timezone }).format(now)
-  const parts = new Intl.DateTimeFormat(FMT_LOCALE, {
-    timeZone: timezone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).formatToParts(now)
+  const parts = getDateTimeFormatYMDhms(FMT_LOCALE, timezone).formatToParts(now)
   const part = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0)
   return {
     year: part('year'),
@@ -133,4 +125,29 @@ export function buildDateOptions(fields: string[], digit: '2-digit' | 'numeric')
     }
   }
   return options
+}
+
+/** 見る人のロケール・タイムゾーンで、年月日時分の日時フォーマッタを返す */
+export function getDateTimeFormatYMDhm(c: Context<{ Bindings: Env }>): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(getLocale(c), {
+    timeZone: getTimezone(c),
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+/** 指定ロケール・タイムゾーンで、年月日時分秒の日時フォーマッタを返す */
+export function getDateTimeFormatYMDhms(locale: string, timeZone: string): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(locale, {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
 }
