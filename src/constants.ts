@@ -1,11 +1,11 @@
+export const BASE = 316781
+export const VALUE_MAX = 999999
+
 export const DEFAULT_TIMEZONE = 'Asia/Tokyo'
 export const FMT_LOCALE = 'sv-SE'
 export const DEFAULT_LOCALE = 'ja-JP'
 
 export const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-export const BASE = 316781
-export const VALUE_MAX = 999999
 
 export const MINUTE = 60
 export const HOUR = 60 * MINUTE
