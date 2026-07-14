@@ -26,5 +26,5 @@ export function infoClockResponse(
     `<animate attributeName="height" calcMode="discrete" ` +
     `values="${values.join(';')}" keyTimes="${keyTimes.join(';')}" ` +
     `dur="${DAY}s" repeatCount="indefinite"/>`
-  return infoResponse(c, hour * BASE + minuteSecond, status, widthAnim + heightAnim)
+  return infoResponse(c, hour * BASE + minuteSecond, { status, content: widthAnim + heightAnim })
 }

@@ -18,7 +18,7 @@ function estimateLines(text: string): number {
 }
 
 /** コメント一覧を、デザインされた SVG（foreignObject）画像で返す */
-export function viewCommentResponse(c: Context<{ Bindings: Env }>, rows: CommentRow[], cacheControl = 'no-store'): Response {
+export function viewCommentResponse(c: Context<{ Bindings: Env }>, rows: CommentRow[]): Response {
   let height = 0
   let inner: string
   if (rows.length === 0) {
@@ -37,5 +37,5 @@ export function viewCommentResponse(c: Context<{ Bindings: Env }>, rows: Comment
       })
       .join('')
   }
-  return viewHtmlResponse(c, WIDTH, height, `<style>${STYLE}</style>${inner}`, cacheControl)
+  return viewHtmlResponse(c, WIDTH, height, `<style>${STYLE}</style>${inner}`)
 }
