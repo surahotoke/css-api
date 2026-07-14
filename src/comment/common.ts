@@ -1,12 +1,13 @@
 import { getCookie } from 'hono/cookie'
 import type { Context } from 'hono'
+import { ENV } from '../cookie/common'
 
 export const LIST_LIMIT = 20
 export const NAME_MAX = 24
 export const NAME_PATTERN = new RegExp(`^[\\p{L}\\p{N}\\p{M}・._\\-]{1,${NAME_MAX}}$`, 'v')
 export const COMMENT_MAX = 280
 export const DEFAULT_NAME = '名無し'
-export const COMMENT_NAME_COOKIE = 'server_comment.name'
+export const COMMENT_NAME_COOKIE = ENV + 'comment.name'
 
 /** コメント投稿者名（未設定・不正値なら名無し） */
 export function getName(c: Context<{ Bindings: Env }>): string {

@@ -1,13 +1,14 @@
 import { Hono } from 'hono'
 import { getCookie, setCookie } from 'hono/cookie'
 import { COOKIE_OPT, ERROR_CODE } from '../constants'
-import { infoResponse, successResponse, errorResponse as infoErrorResponse } from '../response/info'
-import { viewTextResponse, errorResponse as viewErrorResponse } from '../response/view'
+import { successResponse, errorResponse as infoErrorResponse } from '../response/info'
+import { VAR } from './common'
+import { infoListIncludesResponse, infoListIndexResponse, viewListAtResponse } from './response'
 
 export const list = new Hono<{ Bindings: Env }>()
 
 list.get('/push/:name', (c) => {
-  const name = c.req.param('name')
+  const name = VAR + c.req.param('name')
   const valueRaw = c.req.query('value')
   const cookie = getCookie(c, name)
   const current = cookie ?? ''
@@ -18,7 +19,7 @@ list.get('/push/:name', (c) => {
 })
 
 list.get('/remove/:name', (c) => {
-  const name = c.req.param('name')
+  const name = VAR + c.req.param('name')
   const valueRaw = c.req.query('value')
   const indexRaw = c.req.query('index')
   const cookie = getCookie(c, name)
@@ -38,34 +39,8 @@ list.get('/remove/:name', (c) => {
   return successResponse(c)
 })
 
-list.get('/includes/:name', (c) => {
-  const name = c.req.param('name')
-  const valueRaw = c.req.query('value')
-  const cookie = getCookie(c, name)
-  if (valueRaw === undefined) return infoErrorResponse(c, ERROR_CODE.BAD_REQUEST)
-  const items = cookie === undefined ? [] : cookie.split(',')
-  return infoResponse(c, items.includes(valueRaw) ? 1 : 0)
-})
+list.get('/includes/:name', (c) => infoListIncludesResponse(c, VAR))
 
-list.get('/index/:name', (c) => {
-  const name = c.req.param('name')
-  const valueRaw = c.req.query('value')
-  const cookie = getCookie(c, name)
-  if (valueRaw === undefined) return infoErrorResponse(c, ERROR_CODE.BAD_REQUEST)
-  const items = cookie === undefined ? [] : cookie.split(',')
-  const i = items.indexOf(valueRaw)
-  if (i < 0) return infoErrorResponse(c, ERROR_CODE.NOT_FOUND)
-  return infoResponse(c, i)
-})
+list.get('/index/:name', (c) => infoListIndexResponse(c, VAR))
 
-list.get('/at/:name', (c) => {
-  const name = c.req.param('name')
-  const indexRaw = c.req.query('index')
-  const cookie = getCookie(c, name)
-  const index = indexRaw === undefined ? NaN : Math.trunc(Number(indexRaw))
-  if (Number.isNaN(index)) return viewErrorResponse(c, ERROR_CODE.BAD_REQUEST)
-  const items = cookie === undefined ? [] : cookie.split(',')
-  const item = items.at(index)
-  if (item === undefined) return viewErrorResponse(c, ERROR_CODE.NOT_FOUND)
-  return viewTextResponse(c, item)
-})
+list.get('/at/:name', (c) => viewListAtResponse(c, VAR))
