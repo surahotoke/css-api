@@ -31,8 +31,12 @@ export type NowFields = ReturnType<typeof getNowFields>
 
 /** 現在日時（nowFields）を基準に、クエリの set/add 系パラメータで年月日時分秒をずらした Date を返す */
 export function shiftDate(c: Context<{ Bindings: Env }>, nowFields: NowFields): Date {
-  const num = (name: string): number | undefined => {
+  const getField = (name: string): number | undefined => {
     const raw = c.req.query(name)
+    if (name === 'day') {
+      const i = WEEKDAYS.indexOf(raw ?? '')
+      return i < 0 ? undefined : i
+    }
     return raw === undefined ? undefined : Math.trunc(Number(raw))
   }
 
@@ -41,50 +45,31 @@ export function shiftDate(c: Context<{ Bindings: Env }>, nowFields: NowFields): 
   )
 
   // --- set ---
-  const year = num('year')
-  const month = num('month')
+  const year = getField('year')
+  const month = getField('month')
+  const week = getField('week')
+  const date = getField('date')
+  const dayIndex = getField('day')
+  const hour = getField('hour')
+  const minute = getField('minute')
+  const second = getField('second')
   if (year !== undefined) shifted.setUTCFullYear(year)
   if (month !== undefined) shifted.setUTCMonth(month - 1)
-
-  const date = num('date')
-  const week = num('week')
-  const dayParam = c.req.query('day')
-  const dayIndex = dayParam === undefined ? -1 : WEEKDAYS.indexOf(dayParam)
-
-  if (week !== undefined) {
-    const landing = new Date(Date.UTC(shifted.getUTCFullYear(), shifted.getUTCMonth(), 1))
-    landing.setUTCDate(1 + (week - 1) * 7)
-    if (date !== undefined) {
-      shifted.setUTCFullYear(landing.getUTCFullYear(), landing.getUTCMonth(), date)
-    } else {
-      shifted.setUTCFullYear(landing.getUTCFullYear(), landing.getUTCMonth(), landing.getUTCDate())
-      if (dayIndex >= 0) {
-        const cur = (shifted.getUTCDay() + 6) % 7
-        shifted.setUTCDate(shifted.getUTCDate() + (dayIndex - cur))
-      }
-    }
-  } else if (date !== undefined) {
-    shifted.setUTCDate(date)
-  } else if (dayIndex >= 0) {
-    const cur = (shifted.getUTCDay() + 6) % 7
-    shifted.setUTCDate(shifted.getUTCDate() + (dayIndex - cur))
-  }
-
-  const hour = num('hour')
-  const minute = num('minute')
-  const second = num('second')
+  if (week !== undefined) shifted.setUTCFullYear(shifted.getUTCFullYear(), shifted.getUTCMonth(), 1 + (week - 1) * 7)
+  if (date !== undefined) shifted.setUTCDate(date)
+  if (dayIndex !== undefined) shifted.setUTCDate(shifted.getUTCDate() + dayIndex - ((shifted.getUTCDay() + 6) % 7))
   if (hour !== undefined) shifted.setUTCHours(hour)
   if (minute !== undefined) shifted.setUTCMinutes(minute)
   if (second !== undefined) shifted.setUTCSeconds(second)
 
   // --- add ---
-  const addyear = num('addyear')
-  const addmonth = num('addmonth')
-  const addweek = num('addweek')
-  const adddate = num('adddate')
-  const addhour = num('addhour')
-  const addminute = num('addminute')
-  const addsecond = num('addsecond')
+  const addyear = getField('addyear')
+  const addmonth = getField('addmonth')
+  const addweek = getField('addweek')
+  const adddate = getField('adddate')
+  const addhour = getField('addhour')
+  const addminute = getField('addminute')
+  const addsecond = getField('addsecond')
   if (addyear !== undefined) shifted.setUTCFullYear(shifted.getUTCFullYear() + addyear)
   if (addmonth !== undefined) shifted.setUTCMonth(shifted.getUTCMonth() + addmonth)
   if (addweek !== undefined) shifted.setUTCDate(shifted.getUTCDate() + addweek * 7)
