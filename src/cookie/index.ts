@@ -5,6 +5,7 @@ import { successResponse } from '../response/info'
 import { VAR } from './common'
 import { number } from './number'
 import { list } from './list'
+import { env } from './env'
 import { viewValueResponse } from './response'
 
 export const cookie = new Hono<{ Bindings: Env }>()
@@ -26,3 +27,4 @@ cookie.get('/delete/:name', (c) => {
 
 cookie.route('/number', number)
 cookie.route('/list', list)
+cookie.route('/env', env)
