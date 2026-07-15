@@ -4,7 +4,20 @@ import type { Context } from 'hono'
 
 const cache = caches.default
 
-export async function fetchWeather(c: Context<{ Bindings: Env }>): Promise<any | null> {
+type WeatherData = {
+  current: {
+    temperature_2m: number
+    relative_humidity_2m: number
+    precipitation: number
+    precipitation_probability: number
+    apparent_temperature: number
+    wind_speed_10m: number
+    weather_code: number
+    surface_pressure: number
+  }
+}
+
+export async function fetchWeather(c: Context<{ Bindings: Env }>): Promise<WeatherData | null> {
   const cf = c.req.raw.cf
   const lat = c.req.query('lat') ?? cf?.latitude ?? '35.6895'
   const lon = c.req.query('lon') ?? cf?.longitude ?? '139.6917'
@@ -17,7 +30,7 @@ export async function fetchWeather(c: Context<{ Bindings: Env }>): Promise<any |
   try {
     const res = await fetch(url)
     if (!res.ok) return null
-    const data = await res.json()
+    const data = (await res.json()) as WeatherData
     const cachedRes = new Response(JSON.stringify(data), {
       headers: {
         'content-type': 'application/json',
