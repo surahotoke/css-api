@@ -21,6 +21,14 @@
       padding-bottom: 4px;
       border-bottom: 1px solid gray;
     }
+    h4 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: gray;
+      font-size: .95rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
     section {
       margin-top: 16px;
       padding: 8px 18px 16px;
@@ -52,184 +60,12 @@
 <body>
 
   <h1>css-api</h1>
-  <p class="lead">CSS から読み取るためのデータを SVG として返す API。値は SVG の寸法に、表示用テキストは画像として返す。フォームの POST も受け付ける。</p>
+  <p class="lead">CSS から読み取るためのデータを SVG として返す API。応答は 3 つのチャンネルに分かれる: <code>info</code>（値を SVG の寸法にエンコード）、<code>view</code>（表示用テキストを画像として返す）、<code>post</code>（フォーム POST を受け付ける）。以下では機能ごとに、その機能が持つ各チャンネルのエンドポイントをまとめている。</p>
 
-  <h2>cookie</h2>
+  <h2>datetime</h2>
+  <p>現在日時。アクセス元のタイムゾーン・ロケールに対応する。</p>
 
-  <section>
-    <h3><code>/cookie/view/:name</code></h3>
-    <p>cookie の値をテキスト画像で返す。数値でなくても、範囲外でもそのまま表示する。存在しなければ 404。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/view/name</code> → name の中身をそのまま表示</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/set/:name</code></h3>
-    <p>cookie に値を書き込む（上書き）。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>value</dt><dd>書き込む値（省略時は空文字）</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/set/score?value=100</code> → score に 100 を書き込む</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/delete/:name</code></h3>
-    <p>cookie を削除する。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/delete/score</code> → score を削除する</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/number/get/:name</code></h3>
-    <p>cookie の値を数値として読んで返す。数値でない、または 0〜999999 の範囲外なら 404。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/number/get/score</code> → score を数値で読む</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/number/add/:name</code></h3>
-    <p>cookie の値に数値を加算する。存在しなければ 0 を基準に加算する。既存値または加算値が数値として読めなければ 400。範囲制限はなく、値はそのまま保持される。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>value</dt><dd>加算する数値（省略時は 1）。負も可</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/number/add/count</code> → count を 1 増やす</p>
-    <p class="eg"><code>/cookie/number/add/count?value=10</code> → count を 10 増やす</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/list/push/:name</code></h3>
-    <p>cookie を「,」区切りのリストとみなし、末尾に要素を追加する。既存が空（または存在しない）ときは区切りなしでそのまま書く。value 未指定なら何もしない。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>value</dt><dd>追加する要素</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/list/push/fruits?value=apple</code> → apple を追加（apple → apple,banana → ...）</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/list/remove/:name</code></h3>
-    <p>「,」区切りリストから要素を 1 つ取り除く。value か index のどちらか一方を指定する（両方・皆無は 400）。value 指定なら最初に一致した要素、index 指定ならその位置（0 始まり、負で末尾から）。対象がなければ 404。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>value</dt><dd>取り除く要素（値で指定）</dd>
-      <dt>index</dt><dd>取り除く位置（0 始まり、負で末尾から）</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/list/remove/fruits?value=banana</code> → banana を取り除く</p>
-    <p class="eg"><code>/cookie/list/remove/fruits?index=-1</code> → 末尾を取り除く</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/list/includes/:name</code></h3>
-    <p>「,」区切りリストに指定要素が含まれるかを 1（あり）/ 0（なし）で返す。完全一致で判定する（部分一致しない）。value 未指定なら 400。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>value</dt><dd>探す要素</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/list/includes/fruits?value=banana</code> → 含めば 1、なければ 0</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/list/index/:name</code></h3>
-    <p>「,」区切りリスト内で指定要素が何番目かを返す（0 始まり）。見つからなければ 404。value 未指定なら 400。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>value</dt><dd>位置を調べる要素</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/list/index/fruits?value=banana</code> → apple,banana なら 1</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/list/at/:name</code></h3>
-    <p>「,」区切りリストの指定位置の要素をテキスト画像で返す。位置は 0 始まり、負なら末尾から（-1 が最後）。範囲外なら 404、index が数値でなければ 400。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>index</dt><dd>取り出す位置（0 始まり、負で末尾から）</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/list/at/fruits?index=1</code> → apple,banana なら banana</p>
-    <p class="eg"><code>/cookie/list/at/fruits?index=-1</code> → 最後の要素</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/env/view/:name</code></h3>
-    <p>env 空間（サービスが管理する予約 cookie）の値をテキスト画像で返す。env 空間は読み取り専用で、書き込み・削除はできない。存在しなければ 404。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）。env_ プレフィックスは自動で付く</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/env/view/comment.name</code> → env 空間の comment.name を表示</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/env/number/get/:name</code></h3>
-    <p>env 空間の値を数値として読んで返す。数値でない、または 0〜999999 の範囲外なら 404。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/env/number/get/count</code> → env 空間の count を数値で読む</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/env/list/includes/:name</code></h3>
-    <p>env 空間の「,」区切りリストに指定要素が含まれるかを 1（あり）/ 0（なし）で返す。完全一致で判定する。value 未指定なら 400。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>value</dt><dd>探す要素</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/env/list/includes/tags?value=vip</code> → 含めば 1、なければ 0</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/env/list/index/:name</code></h3>
-    <p>env 空間の「,」区切りリスト内で指定要素が何番目かを返す（0 始まり）。見つからなければ 404。value 未指定なら 400。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>value</dt><dd>位置を調べる要素</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/env/list/index/tags?value=vip</code> → 見つかった位置</p>
-  </section>
-
-  <section>
-    <h3><code>/cookie/env/list/at/:name</code></h3>
-    <p>env 空間の「,」区切りリストの指定位置の要素をテキスト画像で返す。位置は 0 始まり、負なら末尾から（-1 が最後）。範囲外なら 404、index が数値でなければ 400。</p>
-    <dl>
-      <dt>:name</dt><dd>cookie 名（パス）</dd>
-      <dt>index</dt><dd>取り出す位置（0 始まり、負で末尾から）</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/cookie/env/list/at/tags?index=0</code> → 先頭の要素</p>
-  </section>
-
-  <h2>heartbeat</h2>
-
-  <section>
-    <h3><code>/heartbeat</code></h3>
-    <p>アクセスを打刻し、現在の同時接続数をテキスト画像で返す。</p>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/heartbeat</code> → 同時接続数を表示する</p>
-  </section>
-
-  <h2>info</h2>
+  <h4>info</h4>
 
   <section>
     <h3><code>/info/datetime/clock</code></h3>
@@ -258,6 +94,29 @@
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>/info/datetime/current-day</code> → 現在の曜日</p>
   </section>
+
+  <h4>view</h4>
+
+  <section>
+    <h3><code>/view/datetime/now</code></h3>
+    <p>現在日時を、人が読めるテキスト画像で返す。基準は常に現在時刻で、パラメータでずらして表示できる。</p>
+    <dl>
+      <dt>year / month / week / date / day / hour / minute / second</dt>
+      <dd>その単位を絶対値でセット。day は曜日（Mon〜Sun）。week、date、day の順に処理される。</dd>
+      <dt>addyear / addmonth / addweek / adddate / addhour / addminute / addsecond</dt>
+      <dd>その単位を相対的に加減算（負も可）。</dd>
+      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（year,month,date,day,hour,minute,second）。all を指定すると全要素。省略時は年月日時分。</dd>
+      <dt>fmt</dt><dd>書式ロケール（例 ja-JP, en-US, sv-SE）。省略時はブラウザの言語。</dd>
+      <dt>pad</dt><dd>付けると月日時分秒をゼロ埋め（2桁）にする。</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/view/datetime/now?addhour=3&amp;show=hour,minute&amp;pad</code> → 3 時間後の時分をゼロ埋めで表示</p>
+  </section>
+
+  <h2>weather</h2>
+  <p>現在の天気（Open-Meteo）。lat / lon を省略するとアクセス元の現在地（取得できなければ東京）を使う。</p>
+
+  <h4>info</h4>
 
   <section>
     <h3><code>/info/weather/temperature</code></h3>
@@ -340,9 +199,27 @@
     <p class="eg"><code>/info/weather/pressure</code> → 1013</p>
   </section>
 
+  <h4>view</h4>
+
+  <section>
+    <h3><code>/view/weather/now</code></h3>
+    <p>現在の天気を、人が読めるテキスト画像で返す。show で表示要素を選べる。</p>
+    <dl>
+      <dt>lat / lon</dt><dd>緯度・経度（省略時はアクセス元の現在地）</dd>
+      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（weather-code, weather, temperature, apparent-temperature, humidity, precipitation, probability, wind-speed, pressure）。all を指定すると全要素。省略時は weather, temperature, humidity。</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/view/weather/now?show=weather,temperature,humidity</code> → 快晴 23℃ 湿度81%</p>
+  </section>
+
+  <h2>stock</h2>
+  <p>株価。東証銘柄は <code>.T</code> を付ける（例: 5244.T）。取引時間中は最大1分キャッシュ、時間外はキャッシュされる。</p>
+
+  <h4>info</h4>
+
   <section>
     <h3><code>/info/stock/open/:symbol</code></h3>
-    <p>指定銘柄の始値。東証は <code>.T</code> を付ける（例: 5244.T）。始値は確定後、翌9:05までキャッシュされる。</p>
+    <p>指定銘柄の始値。始値は確定後、翌9:05までキャッシュされる。</p>
     <dl>
       <dt>:symbol</dt><dd>銘柄コード（パス）。例: 5244.T</dd>
     </dl>
@@ -380,52 +257,7 @@
     <p class="eg"><code>/info/stock/close/5244.T</code> → 173</p>
   </section>
 
-  <section>
-    <h3><code>/info/online-count</code></h3>
-    <p>現在の同時接続数。打刻はせず数だけ返す。</p>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/info/online-count</code> → 現在の同時接続数</p>
-  </section>
-
-  <section>
-    <h3><code>/info/random</code></h3>
-    <p>指定範囲の整数乱数（両端を含む）。</p>
-    <dl>
-      <dt>from</dt><dd>下限（省略時 0）</dd>
-      <dt>to</dt><dd>上限（省略時 999999）</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/info/random?from=1&amp;to=6</code> → 1 から 6 までの乱数を返す</p>
-  </section>
-
-  <h2>view</h2>
-
-  <section>
-    <h3><code>/view/datetime/now</code></h3>
-    <p>現在日時を、人が読めるテキスト画像で返す。基準は常に現在時刻で、パラメータでずらして表示できる。</p>
-    <dl>
-      <dt>year / month / week / date / day / hour / minute / second</dt>
-      <dd>その単位を絶対値でセット。day は曜日（Mon〜Sun）。week、date、day の順に処理される。</dd>
-      <dt>addyear / addmonth / addweek / adddate / addhour / addminute / addsecond</dt>
-      <dd>その単位を相対的に加減算（負も可）。</dd>
-      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（year,month,date,day,hour,minute,second）。all を指定すると全要素。省略時は年月日時分。</dd>
-      <dt>fmt</dt><dd>書式ロケール（例 ja-JP, en-US, sv-SE）。省略時はブラウザの言語。</dd>
-      <dt>pad</dt><dd>付けると月日時分秒をゼロ埋め（2桁）にする。</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/view/datetime/now?addhour=3&amp;show=hour,minute&amp;pad</code> → 3 時間後の時分をゼロ埋めで表示</p>
-  </section>
-
-  <section>
-    <h3><code>/view/weather/now</code></h3>
-    <p>現在の天気を、人が読めるテキスト画像で返す。show で表示要素を選べる。</p>
-    <dl>
-      <dt>lat / lon</dt><dd>緯度・経度（省略時はアクセス元の現在地）</dd>
-      <dt>show</dt><dd>表示する要素をカンマ区切りで指定（weather-code, weather, temperature, apparent-temperature, humidity, precipitation, probability, wind-speed, pressure）。all を指定すると全要素。省略時は weather, temperature, humidity。</dd>
-    </dl>
-    <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/view/weather/now?show=weather,temperature,humidity</code> → 快晴 23℃ 湿度81%</p>
-  </section>
+  <h4>view</h4>
 
   <section>
     <h3><code>/view/stock/:symbol</code></h3>
@@ -437,6 +269,186 @@
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>/view/stock/5244.T?show=all</code> → 始値171円 高値174円 安値170円 終値173円</p>
   </section>
+
+  <h2>cookie</h2>
+  <p>cookie の読み書き。数値・カンマ区切りリスト操作つき。<code>env</code> 空間はサービスが管理する予約 cookie で、読み取り専用。</p>
+
+  <h4>view</h4>
+
+  <section>
+    <h3><code>/cookie/view/:name</code></h3>
+    <p>cookie の値をテキスト画像で返す。数値でなくても、範囲外でもそのまま表示する。存在しなければ 404。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/view/name</code> → name の中身をそのまま表示</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/set/:name</code></h3>
+    <p>cookie に値を書き込む（上書き）。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>書き込む値（省略時は空文字）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/set/score?value=100</code> → score に 100 を書き込む</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/delete/:name</code></h3>
+    <p>cookie を削除する。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/delete/score</code> → score を削除する</p>
+  </section>
+
+  <h4>number</h4>
+
+  <section>
+    <h3><code>/cookie/number/get/:name</code></h3>
+    <p>cookie の値を数値として読んで返す。数値でない、または 0〜999999 の範囲外なら 404。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/number/get/score</code> → score を数値で読む</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/number/add/:name</code></h3>
+    <p>cookie の値に数値を加算する。存在しなければ 0 を基準に加算する。既存値または加算値が数値として読めなければ 400。範囲制限はなく、値はそのまま保持される。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>加算する数値（省略時は 1）。負も可</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/number/add/count</code> → count を 1 増やす</p>
+    <p class="eg"><code>/cookie/number/add/count?value=10</code> → count を 10 増やす</p>
+  </section>
+
+  <h4>list</h4>
+
+  <section>
+    <h3><code>/cookie/list/push/:name</code></h3>
+    <p>cookie を「,」区切りのリストとみなし、末尾に要素を追加する。既存が空（または存在しない）ときは区切りなしでそのまま書く。value 未指定なら何もしない。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>追加する要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/push/fruits?value=apple</code> → apple を追加（apple → apple,banana → ...）</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/list/remove/:name</code></h3>
+    <p>「,」区切りリストから要素を 1 つ取り除く。value か index のどちらか一方を指定する（両方・皆無は 400）。value 指定なら最初に一致した要素、index 指定ならその位置（0 始まり、負で末尾から）。対象がなければ 404。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>取り除く要素（値で指定）</dd>
+      <dt>index</dt><dd>取り除く位置（0 始まり、負で末尾から）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/remove/fruits?value=banana</code> → banana を取り除く</p>
+    <p class="eg"><code>/cookie/list/remove/fruits?index=-1</code> → 末尾を取り除く</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/list/includes/:name</code></h3>
+    <p>「,」区切りリストに指定要素が含まれるかを 1（あり）/ 0（なし）で返す。完全一致で判定する（部分一致しない）。value 未指定なら 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>探す要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/includes/fruits?value=banana</code> → 含めば 1、なければ 0</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/list/index/:name</code></h3>
+    <p>「,」区切りリスト内で指定要素が何番目かを返す（0 始まり）。見つからなければ 404。value 未指定なら 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>位置を調べる要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/index/fruits?value=banana</code> → apple,banana なら 1</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/list/at/:name</code></h3>
+    <p>「,」区切りリストの指定位置の要素をテキスト画像で返す。位置は 0 始まり、負なら末尾から（-1 が最後）。範囲外なら 404、index が数値でなければ 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>index</dt><dd>取り出す位置（0 始まり、負で末尾から）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/list/at/fruits?index=1</code> → apple,banana なら banana</p>
+    <p class="eg"><code>/cookie/list/at/fruits?index=-1</code> → 最後の要素</p>
+  </section>
+
+  <h4>env（読み取り専用）</h4>
+
+  <section>
+    <h3><code>/cookie/env/view/:name</code></h3>
+    <p>env 空間（サービスが管理する予約 cookie）の値をテキスト画像で返す。env 空間は読み取り専用で、書き込み・削除はできない。存在しなければ 404。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）。env_ プレフィックスは自動で付く</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/view/comment.name</code> → env 空間の comment.name を表示</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/env/number/get/:name</code></h3>
+    <p>env 空間の値を数値として読んで返す。数値でない、または 0〜999999 の範囲外なら 404。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/number/get/count</code> → env 空間の count を数値で読む</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/env/list/includes/:name</code></h3>
+    <p>env 空間の「,」区切りリストに指定要素が含まれるかを 1（あり）/ 0（なし）で返す。完全一致で判定する。value 未指定なら 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>探す要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/list/includes/tags?value=vip</code> → 含めば 1、なければ 0</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/env/list/index/:name</code></h3>
+    <p>env 空間の「,」区切りリスト内で指定要素が何番目かを返す（0 始まり）。見つからなければ 404。value 未指定なら 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>位置を調べる要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/list/index/tags?value=vip</code> → 見つかった位置</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/env/list/at/:name</code></h3>
+    <p>env 空間の「,」区切りリストの指定位置の要素をテキスト画像で返す。位置は 0 始まり、負なら末尾から（-1 が最後）。範囲外なら 404、index が数値でなければ 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>index</dt><dd>取り出す位置（0 始まり、負で末尾から）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/list/at/tags?index=0</code> → 先頭の要素</p>
+  </section>
+
+  <h2>comment</h2>
+  <p>掲示板。フォーム UI は CSS 側が持ち、この API は投稿・名前変更の受け口と、一覧・投稿者名の表示画像を提供する。</p>
+
+  <h4>view</h4>
 
   <section>
     <h3><code>/view/comment/list</code></h3>
@@ -455,7 +467,7 @@
     <p class="eg"><code>/view/comment/name</code> → 投稿者名を表示する</p>
   </section>
 
-  <h2>post</h2>
+  <h4>post</h4>
 
   <section>
     <h3><code>/post/comment</code></h3>
@@ -475,6 +487,37 @@
     </dl>
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>&lt;form action="/post/comment/rename" method="post"&gt;</code> に <code>name="rename"</code> の input を置いて送信</p>
+  </section>
+
+  <h2>heartbeat</h2>
+
+  <section>
+    <h3><code>/heartbeat</code></h3>
+    <p>アクセスを打刻し、現在の同時接続数をテキスト画像で返す。</p>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/heartbeat</code> → 同時接続数を表示する</p>
+  </section>
+
+  <h2>online-count</h2>
+
+  <section>
+    <h3><code>/info/online-count</code></h3>
+    <p>現在の同時接続数。打刻はせず数だけ返す。</p>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/online-count</code> → 現在の同時接続数</p>
+  </section>
+
+  <h2>random</h2>
+
+  <section>
+    <h3><code>/info/random</code></h3>
+    <p>指定範囲の整数乱数（両端を含む）。</p>
+    <dl>
+      <dt>from</dt><dd>下限（省略時 0）</dd>
+      <dt>to</dt><dd>上限（省略時 999999）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/info/random?from=1&amp;to=6</code> → 1 から 6 までの乱数を返す</p>
   </section>
 
   <footer>
