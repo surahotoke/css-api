@@ -167,6 +167,59 @@
     <p class="eg"><code>/cookie/list/at/fruits?index=-1</code> → 最後の要素</p>
   </section>
 
+  <section>
+    <h3><code>/cookie/env/view/:name</code></h3>
+    <p>env 空間（サービスが管理する予約 cookie）の値をテキスト画像で返す。env 空間は読み取り専用で、書き込み・削除はできない。存在しなければ 404。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）。env_ プレフィックスは自動で付く</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/view/comment.name</code> → env 空間の comment.name を表示</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/env/number/get/:name</code></h3>
+    <p>env 空間の値を数値として読んで返す。数値でない、または 0〜999999 の範囲外なら 404。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/number/get/count</code> → env 空間の count を数値で読む</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/env/list/includes/:name</code></h3>
+    <p>env 空間の「,」区切りリストに指定要素が含まれるかを 1（あり）/ 0（なし）で返す。完全一致で判定する。value 未指定なら 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>探す要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/list/includes/tags?value=vip</code> → 含めば 1、なければ 0</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/env/list/index/:name</code></h3>
+    <p>env 空間の「,」区切りリスト内で指定要素が何番目かを返す（0 始まり）。見つからなければ 404。value 未指定なら 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>value</dt><dd>位置を調べる要素</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/list/index/tags?value=vip</code> → 見つかった位置</p>
+  </section>
+
+  <section>
+    <h3><code>/cookie/env/list/at/:name</code></h3>
+    <p>env 空間の「,」区切りリストの指定位置の要素をテキスト画像で返す。位置は 0 始まり、負なら末尾から（-1 が最後）。範囲外なら 404、index が数値でなければ 400。</p>
+    <dl>
+      <dt>:name</dt><dd>cookie 名（パス）</dd>
+      <dt>index</dt><dd>取り出す位置（0 始まり、負で末尾から）</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>/cookie/env/list/at/tags?index=0</code> → 先頭の要素</p>
+  </section>
+
   <h2>heartbeat</h2>
 
   <section>
@@ -352,7 +405,7 @@
     <p>現在日時を、人が読めるテキスト画像で返す。基準は常に現在時刻で、パラメータでずらして表示できる。</p>
     <dl>
       <dt>year / month / week / date / day / hour / minute / second</dt>
-      <dd>その単位を絶対値でセット。day は曜日（Mon〜Sun）。優先度は date &gt; week &gt; day。</dd>
+      <dd>その単位を絶対値でセット。day は曜日（Mon〜Sun）。week、date、day の順に処理される。</dd>
       <dt>addyear / addmonth / addweek / adddate / addhour / addminute / addsecond</dt>
       <dd>その単位を相対的に加減算（負も可）。</dd>
       <dt>show</dt><dd>表示する要素をカンマ区切りで指定（year,month,date,day,hour,minute,second）。all を指定すると全要素。省略時は年月日時分。</dd>
@@ -376,7 +429,7 @@
 
   <section>
     <h3><code>/view/stock/:symbol</code></h3>
-    <p>指定銘柄の株価を、人が読めるテキスト画像で返す。show で表示要素を選べる。取引時間中は最大1分キャッシュ。時間外はキャッシュされる。</p>
+    <p>指定銘柄の株価を、人が読めるテキスト画像で返す。show で表示要素を選べる。取引時間中は最大1分キャッシュ。時間外はキャッシュされる。ただし show=open のみの場合は始値専用の長期キャッシュ（翌9:05まで）を使う。</p>
     <dl>
       <dt>:symbol</dt><dd>銘柄コード（パス）。東証は <code>.T</code> を付ける（例: 5244.T）</dd>
       <dt>show</dt><dd>表示する要素をカンマ区切りで指定（open, high, low, close）。all を指定すると全要素。省略時は close。</dd>
