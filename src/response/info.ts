@@ -1,9 +1,10 @@
-import { BASE, SUCCESS_CODE } from '../constants'
+import { LIMIT_VALUE, SUCCESS_CODE } from '../constants'
 import { SVG_NAMESPACE, type CacheOption } from './common'
 import type { Context } from 'hono'
 
 export type InfoOptions = CacheOption & {
   status?: number
+  subValue?: number
   content?: string
 }
 
@@ -11,19 +12,19 @@ export type StatusOptions = CacheOption & {
   status?: number
 }
 
-function dataToSvgSize(value: number, status: number): { width: number; height: number } {
+function dataToSvgSize(value: number, status: number, subValue: number = 0): { width: number; height: number } {
   return {
-    width: value % BASE,
-    height: 900 * Math.floor(value / BASE) + status - 100,
+    width: value + LIMIT_VALUE,
+    height: 900 * subValue + status - 100,
   }
 }
 
 export function infoResponse(
   c: Context<{ Bindings: Env }>,
   value: number,
-  { status = SUCCESS_CODE.OK, content = '', cacheControl = 'no-store' }: InfoOptions = {},
+  { status = SUCCESS_CODE.OK, subValue = 0, content = '', cacheControl = 'no-store' }: InfoOptions = {},
 ): Response {
-  const { width, height } = dataToSvgSize(value, status)
+  const { width, height } = dataToSvgSize(value, status, subValue)
   c.header('content-type', 'image/svg+xml')
   c.header('cache-control', cacheControl)
   return c.body(`<svg xmlns="${SVG_NAMESPACE}" width="${width}" height="${height}">${content}</svg>`)

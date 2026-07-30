@@ -120,23 +120,23 @@
 
   <section>
     <h3><code>/info/weather/temperature</code></h3>
-    <p>現在の気温。絶対温度の10倍。</p>
+    <p>現在の気温。摂氏の10倍。</p>
     <dl>
       <dt>lat</dt><dd>緯度（省略時 35.6895＝東京）</dd>
       <dt>lon</dt><dd>経度（省略時 139.6917＝東京）</dd>
     </dl>
     <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/info/weather/temperature?lat=35.6895&lon=139.6917</code> → 2967（296.7K）</p>
+    <p class="eg"><code>/info/weather/temperature?lat=35.6895&lon=139.6917</code> → 236（23.6℃）</p>
   </section>
 
   <section>
     <h3><code>/info/weather/apparent-temperature</code></h3>
-    <p>現在の体感温度。絶対温度の10倍。</p>
+    <p>現在の体感温度。摂氏の10倍。</p>
     <dl>
       <dt>lat / lon</dt><dd>緯度・経度（省略時は東京）</dd>
     </dl>
     <p class="eg-label">使用例:</p>
-    <p class="eg"><code>/info/weather/apparent-temperature</code> → 3025（302.5K）</p>
+    <p class="eg"><code>/info/weather/apparent-temperature</code> → 291（29.1℃）</p>
   </section>
 
   <section>
@@ -310,7 +310,7 @@
 
   <section>
     <h3><code>/cookie/number/get/:name</code></h3>
-    <p>cookie の値を数値として読んで返す。数値でない、または 0〜999999 の範囲外なら 404。</p>
+    <p>cookie の値を数値として読んで返す。数値でない、または -8388607〜8388607 の範囲外なら 404。</p>
     <dl>
       <dt>:name</dt><dd>cookie 名（パス）</dd>
     </dl>
@@ -404,7 +404,7 @@
 
   <section>
     <h3><code>/cookie/env/number/get/:name</code></h3>
-    <p>env 空間の値を数値として読んで返す。数値でない、または 0〜999999 の範囲外なら 404。</p>
+    <p>env 空間の値を数値として読んで返す。数値でない、または -8388607〜8388607 の範囲外なら 404。</p>
     <dl>
       <dt>:name</dt><dd>cookie 名（パス）</dd>
     </dl>
@@ -513,8 +513,8 @@
     <h3><code>/info/random</code></h3>
     <p>指定範囲の整数乱数（両端を含む）。</p>
     <dl>
-      <dt>from</dt><dd>下限（省略時 0）</dd>
-      <dt>to</dt><dd>上限（省略時 999999）</dd>
+      <dt>from</dt><dd>下限（省略時 0）。-8388607 以上</dd>
+      <dt>to</dt><dd>上限（省略時 8388607）。8388607 以下</dd>
     </dl>
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>/info/random?from=1&amp;to=6</code> → 1 から 6 までの乱数を返す</p>

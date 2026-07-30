@@ -1,5 +1,5 @@
 import { getCookie } from 'hono/cookie'
-import { VALUE_MAX, ERROR_CODE } from '../constants'
+import { LIMIT_VALUE, ERROR_CODE } from '../constants'
 import { infoResponse, errorResponse as infoErrorResponse } from '../response/info'
 import { viewTextResponse, errorResponse as viewErrorResponse } from '../response/view'
 import type { Context } from 'hono'
@@ -19,7 +19,7 @@ export function infoNumberResponse(c: Context<{ Bindings: Env }>, prefix: Cookie
   const cookie = getCookie(c, name)
   if (cookie === undefined) return infoErrorResponse(c, ERROR_CODE.NOT_FOUND)
   const value = Math.round(Number(cookie))
-  if (Number.isNaN(value) || value < 0 || value > VALUE_MAX) return infoErrorResponse(c, ERROR_CODE.NOT_FOUND)
+  if (Number.isNaN(value) || value < -LIMIT_VALUE || LIMIT_VALUE < value) return infoErrorResponse(c, ERROR_CODE.NOT_FOUND)
   return infoResponse(c, value)
 }
 

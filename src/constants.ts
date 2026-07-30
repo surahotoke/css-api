@@ -1,5 +1,4 @@
-export const BASE = 316781
-export const VALUE_MAX = 999999
+export const LIMIT_VALUE = 8388607
 
 export const DEFAULT_TIMEZONE = 'Asia/Tokyo'
 export const FMT_LOCALE = 'sv-SE'
