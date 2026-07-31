@@ -9,7 +9,7 @@ CSS から読み取るためのデータを SVG として返す API。Cloudflare
 ## 仕組み
 JS を使わず CSS だけでデータを扱えるように、レスポンスを 3 つのチャンネルに分けている。
 
-- **info** — 値を SVG の寸法にエンコードして返す。`width = value % 316781`、`height = 900 × floor(value / 316781) + (status − 100)`。CSS 側（[ultra-css-template](https://github.com/surahotoke/ultra-css-template) の api-getter）が scroll-timeline でデコードし、HTTP ステータスまで CSS から参照できる
+- **info** — 値を SVG の寸法にエンコードして返す。`width = value + 8388607`、`height = 900 × subValue + (status − 100)`。CSS 側（[ultra-css-template](https://github.com/surahotoke/ultra-css-template) の api-getter）が scroll-timeline でデコードし、HTTP ステータスまで CSS から参照できる
 - **view** — 人が読むテキストを SVG 画像として返す。ユーザー入力を含む内容も `<img>` で表示される画像なのでスクリプトは実行されない（XSS 防止）
 - **post** — フォーム POST を受け、referer へ 303 リダイレクトで戻す（PRG）。フォーム UI 自体は CSS 側が持ち、この API はデータの受け口だけを提供する
 

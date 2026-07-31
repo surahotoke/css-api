@@ -9,7 +9,7 @@ An API that serves data as SVG so it can be read from CSS. Cloudflare Workers + 
 ## How it works
 Responses are split into three channels so that data can be handled purely in CSS, without JavaScript.
 
-- **info** — Encodes a value into the SVG's dimensions: `width = value % 316781`, `height = 900 × floor(value / 316781) + (status − 100)`. The CSS side (api-getter in [ultra-css-template](https://github.com/surahotoke/ultra-css-template)) decodes it via scroll timelines, and even the HTTP status is readable from CSS
+- **info** — Encodes a value into the SVG's dimensions: `width = value + 8388607`, `height = 900 × subValue + (status − 100)`. The CSS side (api-getter in [ultra-css-template](https://github.com/surahotoke/ultra-css-template)) decodes it via scroll timelines, and even the HTTP status is readable from CSS
 - **view** — Returns human-readable text as an SVG image. Since content — including user input — is displayed as an image via `<img>`, no scripts can run (XSS prevention)
 - **post** — Accepts form POSTs and redirects back to the referer with a 303 (PRG). The form UI itself lives on the CSS side; this API only provides the data endpoint
 
