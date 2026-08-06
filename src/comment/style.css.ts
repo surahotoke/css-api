@@ -11,12 +11,12 @@ export const STYLE = /*css*/ `
   [root] {
     font-family: system-ui, sans-serif;
     padding-inline: ${PADDING}px;
-    color: #333;
+    color: light-dark(#333, #ddd);
   }
 
   div.item {
     padding-block: ${BLOCK_PADDING_Y}px;
-    border-top: ${BORDER_WIDTH}px solid #ddd;
+    border-top: ${BORDER_WIDTH}px solid light-dark(#ddd, #444);
   }
 
   div.item:first-child { border-top: none }
@@ -31,7 +31,7 @@ export const STYLE = /*css*/ `
 
   span.name {
     font-weight: bold;
-    color: #222;
+    color: light-dark(#222, #eee);
     font-size: ${BODY_FONT_SIZE}px;
     min-width: 0;
     white-space: nowrap;
@@ -40,7 +40,7 @@ export const STYLE = /*css*/ `
   }
 
   span.dt {
-    color: #999;
+    color: light-dark(#999, #888);
     font-size: ${DATETIME_FONT_SIZE}px;
     white-space: nowrap;
   }
@@ -58,7 +58,7 @@ export const STYLE = /*css*/ `
     padding-block: ${BLOCK_PADDING_Y}px;
     font-size: ${BODY_FONT_SIZE}px;
     line-height: ${LINE_HEIGHT}px;
-    color: #999;
+    color: light-dark(#999, #888);
     text-align: center;
   }
 `

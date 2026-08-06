@@ -39,7 +39,9 @@ export function viewResponse(
 ): Response {
   c.header('content-type', 'image/svg+xml')
   c.header('cache-control', cacheControl)
-  return c.body(`<svg xmlns="${SVG_NAMESPACE}" width="${width}" height="${height}"${attrs ? ` ${attrs}` : ''}>${content}</svg>`)
+  return c.body(
+    `<svg xmlns="${SVG_NAMESPACE}" width="${width}" height="${height}" style="color-scheme: light dark"${attrs ? ` ${attrs}` : ''}>${content}</svg>`,
+  )
 }
 
 /** HTML を foreignObject の root div で包み、SVG 画像として返す（viewResponse の特殊版） */
@@ -61,7 +63,10 @@ export function viewTextResponse(c: Context<{ Bindings: Env }>, text: string, { 
     .split('\n')
     .map((line, i) => `<tspan x="0" dy="${i === 0 ? '1em' : '1.2em'}">${line || ' '}</tspan>`)
     .join('')
-  return viewResponse(c, width, height, `<text x="0">${tspans}</text>`, { attrs: `font-family="${DEFAULT_MONOSPACE}"`, cacheControl })
+  return viewResponse(c, width, height, `<text x="0" fill="light-dark(black, white)">${tspans}</text>`, {
+    attrs: `font-family="${DEFAULT_MONOSPACE}"`,
+    cacheControl,
+  })
 }
 
 export function errorResponse(c: Context<{ Bindings: Env }>, errorCode: number, { cacheControl = 'no-store' }: CacheOption = {}): Response {
