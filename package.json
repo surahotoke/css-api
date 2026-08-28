@@ -16,7 +16,7 @@
     "prettier-plugin-sql-cst": "^0.22.1",
     "typescript": "^5.5.2",
     "vitest": "~3.2.0",
-    "wrangler": "^4.115.0"
+    "wrangler": "^4.127.0"
   },
   "dependencies": {
     "@google/genai": "^2.19.0",
