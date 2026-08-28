@@ -13,6 +13,9 @@ export const GEMINI_TRIGGER = '@gemini'
 export const GEMINI_NAME = 'Gemini'
 export const GEMINI_API_KEY_COOKIE = ENV + 'comment.gemini-api-key'
 
+/** comments.user_type の値（投稿者の種別） */
+export const USER_TYPE = { USER: 'user', GEMINI: 'gemini' } as const
+
 /** コメント投稿者名（未設定・不正値なら名無し） */
 export function getName(c: Context<{ Bindings: Env }>): string {
   const name = getCookie(c, COMMENT_NAME_COOKIE)?.normalize('NFC').trim()

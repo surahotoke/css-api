@@ -39,6 +39,15 @@ export const STYLE = /*css*/ `
     text-fit: shrink;
   }
 
+  span.name.gemini {
+    color: light-dark(#1a73e8, #8ab4f8);
+  }
+
+  span.mention {
+    color: light-dark(#1a73e8, #8ab4f8);
+    font-weight: bold;
+  }
+
   span.dt {
     color: light-dark(#999, #888);
     font-size: ${DATETIME_FONT_SIZE}px;

@@ -1,7 +1,7 @@
 import { GoogleGenAI, ThinkingLevel } from '@google/genai'
 import { sql } from 'kysely'
 import { getDb } from '../db'
-import { COMMENT_MAX, GEMINI_NAME, GEMINI_TRIGGER } from './common'
+import { COMMENT_MAX, GEMINI_NAME, GEMINI_TRIGGER, USER_TYPE } from './common'
 
 const GEMINI_MODEL = 'gemini-3.5-flash-lite'
 
@@ -17,7 +17,7 @@ const SYSTEM_INSTRUCTION =
 export async function postGeminiReply(env: Env, apiKey: string | undefined, name: string, comment: string): Promise<void> {
   const reply = await generateReply(apiKey, name, comment)
   const db = getDb(env.DB)
-  await sql`INSERT INTO comments (name, comment) VALUES (${GEMINI_NAME}, ${truncate(reply, COMMENT_MAX)})`.execute(db)
+  await sql`INSERT INTO comments (name, comment, user_type) VALUES (${GEMINI_NAME}, ${truncate(reply, COMMENT_MAX)}, ${USER_TYPE.GEMINI})`.execute(db)
 }
 
 async function generateReply(apiKey: string | undefined, name: string, comment: string): Promise<string> {

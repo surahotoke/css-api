@@ -1,0 +1,1 @@
+ALTER TABLE comments ADD COLUMN user_type TEXT NOT NULL DEFAULT 'user';

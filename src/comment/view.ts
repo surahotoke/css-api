@@ -10,8 +10,8 @@ export const view = new Hono<{ Bindings: Env }>()
 
 view.get('/list', async (c) => {
   const db = getDb(c.env.DB)
-  const result = await sql<{ name: string; comment: string; created_at: string }>`
-    SELECT name, comment, created_at
+  const result = await sql<{ name: string; comment: string; created_at: string; user_type: string }>`
+    SELECT name, comment, created_at, user_type
     FROM comments
     ORDER BY id DESC
     LIMIT ${LIST_LIMIT}
@@ -21,6 +21,7 @@ view.get('/list', async (c) => {
     name: row.name,
     comment: row.comment,
     createdAt: dtf.format(new Date(row.created_at)),
+    userType: row.user_type,
   }))
   return viewCommentResponse(c, rows)
 })

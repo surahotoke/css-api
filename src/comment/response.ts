@@ -1,8 +1,17 @@
 import { viewHtmlResponse, escapeXml } from '../response/view'
 import { WIDTH, CONTENT_WIDTH, BODY_FONT_SIZE, LINE_HEIGHT, BLOCK_PADDING_Y, BORDER_WIDTH, STYLE } from './style.css'
+import { GEMINI_TRIGGER, USER_TYPE } from './common'
 import type { Context } from 'hono'
 
-export type CommentRow = { name: string; comment: string; createdAt: string }
+export type CommentRow = { name: string; comment: string; createdAt: string; userType: string }
+
+/** 本文をエスケープし、先頭が @gemini なら色付け用の span で包む */
+function renderBody(comment: string): string {
+  if (!comment.toLowerCase().startsWith(GEMINI_TRIGGER)) return escapeXml(comment)
+  const mention = comment.slice(0, GEMINI_TRIGGER.length)
+  const rest = comment.slice(GEMINI_TRIGGER.length)
+  return `<span class="mention">${escapeXml(mention)}</span>${escapeXml(rest)}`
+}
 
 /** 折り返し見積もりの1行あたり容量。全角=2.1units・半角=1.2units、1unit=0.5em */
 const LINE_CAPACITY = Math.floor(CONTENT_WIDTH / (BODY_FONT_SIZE * 0.5))
@@ -30,8 +39,8 @@ export function viewCommentResponse(c: Context<{ Bindings: Env }>, rows: Comment
         height += (i === 0 ? 0 : BORDER_WIDTH) + BLOCK_PADDING_Y * 2 + LINE_HEIGHT * (1 + estimateLines(row.comment))
         return (
           `<div class="item">` +
-          `<div class="head"><span class="name">${escapeXml(row.name)}</span><span class="dt">${escapeXml(row.createdAt)}</span></div>` +
-          `<p class="body">${escapeXml(row.comment)}</p>` +
+          `<div class="head"><span class="name${row.userType === USER_TYPE.GEMINI ? ' gemini' : ''}">${escapeXml(row.name)}</span><span class="dt">${escapeXml(row.createdAt)}</span></div>` +
+          `<p class="body">${renderBody(row.comment)}</p>` +
           `</div>`
         )
       })
