@@ -472,11 +472,13 @@
   <section>
     <h3><code>/post/comment</code></h3>
     <p>コメントを投稿する。フォームの action 先として使う。投稿者名は cookie に保存された名前（未設定なら名無し）。成功すると referer へ 303 リダイレクトで戻る（referer 必須）。</p>
+    <p>本文の先頭が <code>@gemini</code> のときは、投稿後に Gemini（gemini-3.5-flash-lite）が返答を生成し、完成し次第「Gemini」名義のコメントとして追加される。cookie に保存された Gemini API キー（<code>/post/comment/gemini-api-key</code> で登録）を使う。未登録ならその旨が返答コメントとして追加される。</p>
     <dl>
       <dt>comment</dt><dd>本文（フォームフィールド）。280文字以内。</dd>
     </dl>
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>&lt;form action="/post/comment" method="post"&gt;</code> に <code>name="comment"</code> の textarea を置いて送信</p>
+    <p class="eg"><code>@gemini 今日の運勢は？</code> → 投稿後、Gemini の返答がコメント欄に追加される</p>
   </section>
 
   <section>
@@ -487,6 +489,16 @@
     </dl>
     <p class="eg-label">使用例:</p>
     <p class="eg"><code>&lt;form action="/post/comment/rename" method="post"&gt;</code> に <code>name="rename"</code> の input を置いて送信</p>
+  </section>
+
+  <section>
+    <h3><code>/post/comment/gemini-api-key</code></h3>
+    <p><code>@gemini</code> コメントへの返答に使う Gemini API キーを cookie に保存する。空文字を送ると削除。成功すると referer へ 303 リダイレクトで戻る（referer 必須）。キーはサーバーには保存されず、送信したブラウザの cookie にのみ残る。</p>
+    <dl>
+      <dt>gemini-api-key</dt><dd>Gemini API キー（フォームフィールド）。空文字で削除。</dd>
+    </dl>
+    <p class="eg-label">使用例:</p>
+    <p class="eg"><code>&lt;form action="/post/comment/gemini-api-key" method="post"&gt;</code> に <code>name="gemini-api-key"</code> の input を置いて送信</p>
   </section>
 
   <h2>heartbeat</h2>

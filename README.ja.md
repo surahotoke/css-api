@@ -19,7 +19,7 @@ JS を使わず CSS だけでデータを扱えるように、レスポンスを
 - **weather** — 現在の天気（Open-Meteo、アクセス元の現在地対応）
 - **stock** — 株価（始値/高値/安値/終値、取引時間に応じたキャッシュ）
 - **cookie** — cookie の読み書き。数値（get/add）・カンマ区切りリスト（push/remove/includes/index/at）操作つき
-- **comment** — 掲示板。投稿・名前変更・一覧のデザイン画像（foreignObject + text-fit）
+- **comment** — 掲示板。投稿・名前変更・一覧のデザイン画像（foreignObject + text-fit）。先頭に `@gemini` と書くと Gemini（gemini-3.5-flash-lite）が返信をコメントとして追加（API キーは cookie に登録）
 - **heartbeat / online-count** — 同時接続数（Durable Object）
 - **random** — 整数乱数
 

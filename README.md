@@ -18,7 +18,7 @@ Responses are split into three channels so that data can be handled purely in CS
 - **datetime** — Current date and time (visitor's timezone and locale, shifted display, a clock that keeps ticking via SVG animate)
 - **weather** — Current weather (Open-Meteo, visitor's location supported)
 - **stock** — Stock quotes (open/high/low/close, caching tuned to trading hours)
-- **comment** — Message board: posting, renaming, and a styled list image (foreignObject + text-fit)
+- **comment** — Message board: posting, renaming, and a styled list image (foreignObject + text-fit). Start a comment with `@gemini` and Gemini (gemini-3.5-flash-lite) posts a reply as a comment (API key stored in a cookie)
 - **cookie** — Cookie read/write, with number operations (get/add) and comma-separated list operations (push/remove/includes/index/at)
 - **heartbeat / online-count** — Concurrent connection count (Durable Object)
 - **random** — Random integers

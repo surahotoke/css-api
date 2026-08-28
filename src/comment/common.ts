@@ -9,6 +9,10 @@ export const COMMENT_MAX = 280
 export const DEFAULT_NAME = '名無し'
 export const COMMENT_NAME_COOKIE = ENV + 'comment.name'
 
+export const GEMINI_TRIGGER = '@gemini'
+export const GEMINI_NAME = 'Gemini'
+export const GEMINI_API_KEY_COOKIE = ENV + 'comment.gemini-api-key'
+
 /** コメント投稿者名（未設定・不正値なら名無し） */
 export function getName(c: Context<{ Bindings: Env }>): string {
   const name = getCookie(c, COMMENT_NAME_COOKIE)?.normalize('NFC').trim()
